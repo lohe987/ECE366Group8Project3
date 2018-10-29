@@ -231,9 +231,9 @@ def assemble(I, Nlines):
 
 
 def simulate(I, Nsteps, debug_mode, Memory):
-    print("ECE366 Fall 2018 ISA Design: Simulator")
+    print("ECE366 Fall 2018 FJsquared: Simulator")
     print()
-    PC = 0  # Program-counter
+    PC = 0              # Program-counter
     DIC = 0
     Reg = [0, 0, 0, 0]  # 4 registers, init to all 0
     print("******** Simulation starts *********")
@@ -363,7 +363,7 @@ def main():
     print(" 2 = disassembler")
     print(" 3 = assembler")
     mode = int(input("Please enter the mode of program: "))
-    print("Mode selected: ", end="")
+    print("Mode selected: ", end = "")
     if (mode == 1):
         print("Simulator")
         print("Simulator has 2 modes: ")
