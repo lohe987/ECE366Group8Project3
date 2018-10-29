@@ -1,4 +1,4 @@
-# Authors: Trung Le, Wenjing Rao
+# Group 8: Francis, Jonathan, Jessica
 # This program is a simulator packed with both assembler and disassembler.
 # Simulator has 2 modes:
 #            Debug mode:  Execute program every # steps and
@@ -6,60 +6,140 @@
 #            Normal mode: Execute program all at once
 
 def disassemble(I, Nlines):
-    print("ECE366 Fall 2018 ISA Design: Disassembler")
+    print("ECE366 Fall 2018 \nFJsquared: Disassembler")
     print("-----------------")
     # print(I)
 
     for i in range(Nlines):
-        fetch = I[i]
-        print(fetch)
-        if (fetch[0:2] == "00"):  # init
-            Rx = int(fetch[2:4])
-            imm = int(fetch[4:8], 2)
-            print("init R" + str(Rx) + "," + str(imm))
-        elif (fetch[0:4] == "0100"):  # load
-            Rx = int(fetch[4:6], 2)
-            Ry = int(fetch[6:8], 2)
-            print("load R" + str(Rx) + ",(R" + str(Ry) + ")")
-        elif (fetch[0:4] == "0101"):  # store
-            Rx = int(fetch[4:6], 2)
-            Ry = int(fetch[6:8], 2)
-            print("stre R" + str(Rx) + ",(R" + str(Ry) + ")")
-        elif (fetch[0:4] == "0110"):  # add
-            Rx = int(fetch[4:6], 2)
-            Ry = int(fetch[6:8], 2)
-            print("add R" + str(Rx) + ",R" + str(Ry))
-        elif (fetch[0:4] == "0111"):  # sub
-            Rx = int(fetch[4:6], 2)
-            Ry = int(fetch[6:8], 2)
-            print("sub R" + str(Rx) + ",R" + str(Ry))
-        elif (fetch[0:4] == "1000"):  # addi
-            Rx = int(fetch[4:6], 2)
-            imm = int(fetch[6:8], 2)
-            print("addi R" + str(Rx) + "," + str(imm))
-        elif (fetch[0:4] == "1001"):  # xor
-            Rx = int(fetch[4:6], 2)
-            Ry = int(fetch[6:8], 2)
-            print("xor R" + str(Rx) + ",R" + str(Ry))
-        elif (fetch[0:4] == "1010"):  # sltR0
-            Rx = int(fetch[4:6], 2)
-            Ry = int(fetch[6:8], 2)
-            print("sltR0 R" + str(Rx) + ",R" + str(Ry))
-        elif (fetch[0:4] == "1011"):  # bezR0
-            Rx = int(fetch[4:8], 2)
-            if (Rx > 7):
-                Rx = Rx - 16
-            print("bezR0 " + str(Rx))
-        elif (fetch[0:4] == "1100"):  # jump
-            Rx = int(fetch[4:8], 2)
-            if (Rx > 7):
-                Rx = Rx - 16
-            print("jump " + str(Rx))
-        print()
+        line = I[i]
+        print(line)
+
+        if (line[1:3] == "10"):  # init: 10
+            # Splitting the line to: P|1 0|I I|Rx| I I
+            binaryInput = [line[0], line[1:3], line[3:5], line[5], line[6:8]]
+
+            # Disassembling it to: init imm
+            disassembled[0] = "init "
+            disassembled[1] = "$r" + str(int(binaryInput[3])) + ", "
+            immediate = str(binaryInput[2]) + str(binaryInput[4])
+            if (immediate[0] == '1'):
+                imm = -16 + int(format(int(immediate, 2)))
+                imm = str(int(imm))
+            else:
+                imm = str(int(format(int(immediate, 2))))
+            disassembled[2] = imm
+
+            print(disassembled[0] + disassembled[1] + disassembled[2])
+
+        elif (line[1:3] == '11'):  # bez: 11
+            # Splitting the line to: P|1 0|X X|Rx|X X
+            binaryInput = [line[0], line[1:3], line[3:5], line[5], line[6:8]]
+
+            # Disassembling it to: bez imm
+            disassembled[0] = "bez "
+            disassembled[1] = "$r" + binaryInput[3]
+
+            print(disassembled[0] + disassembled[1])
+
+        elif (line[1:5] == '0000'):  # add: 0000
+            # Splitting the line to: P|0 0 0 0|Rx|Ry Ry
+            binaryInput = [line[0], line[1:5], line[5], line[6:8]]
+
+            # Disassembling it to: add rx, ry
+            disassembled[0] = "add "
+            rx = str(int(format(int(binaryInput[2], 2))))
+            ry = str(int(format(int(binaryInput[3], 2))))
+            disassembled[1] = "$r" + rx + ", "
+            disassembled[2] = "$r" + ry + "\t"
+
+            print(disassembled[0] + disassembled[1] + disassembled[2])
+
+        elif (line[1:5] == '0001'):  # slt: 0001
+            # Splitting the line to: P|0 0 0 1|Rx|Ry Ry
+            binaryInput = [line[0], line[1:5], line[5], line[6:8]]
+
+            # Disassembling it to: slt rx, ry
+            disassembled[0] = "slt "
+            rx = str(int(format(int(binaryInput[1], 2))))
+            ry = str(int(format(int(binaryInput[2], 2))))
+            disassembled[1] = "$r" + rx + ", "
+            disassembled[2] = "$r" + ry
+
+            print(disassembled[0] + disassembled[1] + disassembled[2])
+
+        elif (line[1:5] == '0011'):  # lw: 0011
+            # Splitting the line to: P|0 0 1 1|Rx|Ry Ry
+            binaryInput = [line[0], line[1:5], line[5], line[6:8]]
+
+            # Disassembling it to: lw imm (unsigned)
+            disassembled[0] = "lw "
+            disassembled[1] = "$r" + str(int(format(int(binaryInput[2], 2)))) + ", "
+            disassembled[2] = "$r" + str(int(format(int(binaryInput[3], 2))))
+
+            print(disassembled[0] + disassembled[1] + disassembled[2])
+
+        elif (line[1:5] == '0010'):  # sw: 0010
+            # Splitting the line to: P|0 0 1 0|Rx|Ry Ry
+            binaryInput = [line[0], line[1:5], line[5], line[6:8]]
+
+            # Disassembling it to: sw imm (unsigned)
+            disassembled[0] = "sw "
+            disassembled[1] = "$r" + str(int(format(int(binaryInput[2], 2)))) + ", "
+            disassembled[2] = "$r" + str(int(format(int(binaryInput[3], 2))))
+
+            print(disassembled[0] + disassembled[1] + disassembled[2])
+
+        elif (line[1:5] == '0100'):  # xor: 0100
+            # Splitting the line to: P|0 1 0 0|Rx|Ry Ry
+            binaryInput = [line[0], line[1:5], line[5], line[6:8]]
+
+            # Disassembling it to: xor rx, ry
+            disassembled[0] = "xor "
+            rx = str(int(format(int(binaryInput[2], 2))))
+            ry = str(int(format(int(binaryInput[3], 2))))
+            disassembled[1] = "$r" + rx + ", "
+            disassembled[2] = "$r" + ry
+
+            print(disassembled[0] + disassembled[1] + disassembled[2])
+
+        elif (line[1:5] == '0101'):  # and: 0101
+            # Splitting the line to: P|0 1 0 1|Rx|Ry Ry
+            binaryInput = [line[0], line[1:5], line[5], line[6:8], line[8:]]
+
+            # Disassembling it to: and rx, ry
+            disassembled[0] = "and "
+            rx = str(int(format(int(binaryInput[2], 2))))
+            ry = str(int(format(int(binaryInput[3], 2))))
+            disassembled[1] = "$r" + rx + ", "
+            disassembled[2] = "$r" + ry
+
+            print(disassembled[0] + disassembled[1] + disassembled[2])
+
+        elif (line[1:5] == '0111'):  # srl: 0111
+            # Splitting the line to: P|0 1 1 1|X| Rx Rx
+            binaryInput = [line[0:0], line[1:5], line[5], line[6:7]]
+
+            # Disassembling it to: srl rx
+            disassembled[0] = "srl "
+            disassembled[1] = "$r" + str(int(format(int(binaryInput[3], 2))))
+
+            print(disassembled[0] + disassembled[1])
+
+        elif (line[1:5] == '0110'):  # sub: 0110
+            # Splitting the line to: P|0 1 1 1|Rx|Ry|Rz
+            binaryInput = [line[0], line[1:5], line[5], line[6], line[7]]
+
+            # Disassembling it to: sub rx, ry, rz
+            disassembled[0] = "sub "
+            disassembled[1] = "$r" + str(binaryInput[2]) + ","
+            disassembled[2] = "$r" + str(binaryInput[3]) + ","
+            disassembled[3] = "$" + str(binaryInput[4])
+
+            print(disassembled[0] + disassembled[1] + disassembled[2] + disassembled[3])
 
 
 def assemble(I, Nlines):
-    print("ECE366 Fall 2018 ISA Design: Assembler")
+    print("ECE366 Fall 2018 FJsquared: Assembler")
     print("")
 
     for i in range(Nlines):
