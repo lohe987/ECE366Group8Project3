@@ -219,8 +219,8 @@ def assemble(I, Nlines):
             op = "0111"
             print("P " + op + " X " + Rx)
 
-        elif (line[0:4] == "sub "):
-            line = line.replace("jump ", "")
+        elif (line[0:5] == "sub "):
+            line = line.replace("sub ", "")
             line = line.split(",")
             Rx = int(line[0])
             Ry = int(line[1])
