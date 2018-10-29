@@ -143,100 +143,91 @@ def assemble(I, Nlines):
     print("")
 
     for i in range(Nlines):
-        fetch = I[i]
+        line = I[i]
         print()
-        print(fetch)
-        fetch = fetch.replace("R", "")
-        if (fetch[0:4] == "init"):
-            fetch = fetch.replace("init ", "")
-            fetch = fetch.split(",")
-            R = format(int(fetch[0]), "02b")
-            imm = format(int(fetch[1]), "04b")
-            op = "00"
-            print(op + " " + R + " " + imm)
-        elif (fetch[0:4] == "addi"):
-            fetch = fetch.replace("addi ", "")
-            fetch = fetch.split(",")
-            R = format(int(fetch[0]), "02b")
-            imm = format(int(fetch[1]), "02b")
-            op = "1000"
-            print(op + " " + R + " " + imm)
-        elif (fetch[0:4] == "add "):
-            fetch = fetch.replace("add ", "")
-            fetch = fetch.split(",")
-            Rx = format(int(fetch[0]), "02b")
-            Ry = format(int(fetch[1]), "02b")
-            op = "0110"
-            print(op + " " + Rx + " " + Ry)
+        print(line)
+        line = line.replace("$", "")
+        line = line.replace("r", "")
 
-        elif (fetch[0:4] == "sub "):
-            fetch = fetch.replace("sub ", "")
-            fetch = fetch.split(",")
-            Rx = format(int(fetch[0]), "02b")
-            Ry = format(int(fetch[1]), "02b")
-            op = "0111"
-            print(op + " " + Rx + " " + Ry)
-        elif (fetch[0:4] == "xor "):
-            fetch = fetch.replace("xor ", "")
-            fetch = fetch.split(",")
-            Rx = format(int(fetch[0]), "02b")
-            Ry = format(int(fetch[1]), "02b")
-            op = "1001"
-            print(op + " " + Rx + " " + Ry)
+        if (line[0:5] == "init"):
+            line = line.replace("init ", "")
+            line = line.split(",")
+            R = format(int(line[0]), "02b")
+            imm = str(format(int(line[1]), "04b"))
+            op = "10"
+            print("P " + op + " " + imm[0:3] + " " + R + " " + imm[2:4])
 
-        elif (fetch[0:4] == "load"):
-            fetch = fetch.replace("load ", "")
-            fetch = fetch.replace("(", "")
-            fetch = fetch.replace(")", "")
-            fetch = fetch.split(",")
-            Rx = format(int(fetch[0]), "02b")
-            Ry = format(int(fetch[1]), "02b")
+        elif (line[0:5] == "bez "):
+            line = line.replace("bez ", "")
+            R = format(int(line), "01b")
+            op = "11"
+            print("P " + op + " XX " + R + " XX ")
+
+        elif (line[0:5] == "add "):
+            line = line.replace("add ", "")
+            line = line.split(",")
+            Rx = format(int(line[0]), "01b")
+            Ry = format(int(line[1]), "02b")
+            op = "0000"
+            print("P " + op + " " + Rx + " " + Ry)
+
+        elif (line[0:5] == "slt "):
+            line = line.replace("slt ", "")
+            line = line.split(",")
+            Ry = format(int(line[0]), "01b")
+            Rx = format(int(line[1]), "02b")
+            op = "0001"
+            print("P " + op + " " + Rx + " " + Ry)
+
+        elif (line[0:4] == "lw "):
+            line = line.replace("lw ", "")
+            line = line.split(",")
+            Ry = format(int(line[0]), "02b")
+            Rx = format(int(line[1]), "01b")
+            op = "0011"
+            print("P " + op + " " + Rx + " " + Ry)
+
+        elif (line[0:4] == "sw "):
+            line = line.replace("sw ", "")
+            line = line.split(",")
+            Ry = format(int(line[0]), "02b")
+            Rx = format(int(line[1]), "01b")
+            op = "0010"
+            print ("P " + op + " " + Rx + " " + Ry)
+
+        elif (line[0:5] == "XOR "):
+            line = line.replace("XOR ", "")
+            line = line.split(",")
+            Rx = format(int(line[0]), "01b")
+            Ry = format(int(line[1]), "02b")
             op = "0100"
-            print (op + " " + Rx + " " + Ry)
+            print ("P " + op + " " + Rx + " " + Ry)
 
-        elif (fetch[0:4] == "stre"):
-            fetch = fetch.replace("stre ", "")
-            fetch = fetch.replace("(", "")
-            fetch = fetch.replace(")", "")
-            fetch = fetch.split(",")
-            Rx = format(int(fetch[0]), "02b")
-            Ry = format(int(fetch[1]), "02b")
+        elif (line[0:5] == "AND "):  # why "slt0" instead of "sltR0" ?
+            line = line.replace("AND ", "")
+            line = line.split(",")
+            Rx = format(int(line[0]), "01b")
+            Ry = format(int(line[1]), "02b")
             op = "0101"
-            print (op + " " + Rx + " " + Ry)
-        elif (fetch[0:4] == "slt0"):  # why "slt0" instead of "sltR0" ?
-            # --> because all the 'R' is deleted at fetch to make things simplier.
-            fetch = fetch.replace("slt0 ", "")
-            fetch = fetch.split(",")
-            Rx = format(int(fetch[0]), "02b")
-            Ry = format(int(fetch[1]), "02b")
-            op = "1010"
-            print (op + " " + Rx + " " + Ry)
+            print ("P " + op + " " + Rx + " " + Ry)
 
-        elif (fetch[0:4] == "bez0"):
-            fetch = fetch.replace("bez0 ", "")
-            fetch = fetch.split(",")
-            imm = int(fetch[0])
+        elif (line[0:5] == "srl "):
+            line = line.replace("srl ", "")
+            line = line.split(",")
+            Rx = format(int(line[0]), "02b")
 
-            if (imm < 0):
-                imm = format(15 - abs(imm) + 1, "04b")
-            else:
-                imm = format(imm, "04b")
-            op = "1011"
-            print(op + " " + imm)
+            op = "0111"
+            print("P " + op + " X " + Rx)
 
-        elif (fetch[0:4] == "jump"):
-            fetch = fetch.replace("jump ", "")
-            fetch = fetch.split(",")
-            imm = int(fetch[0])
-            if (imm < 0):
-                imm = format(15 - abs(imm) + 1, "04b")
-            else:
-                imm = format(imm, "04b")
-            op = "1100"
-            print(op + " " + imm)
-        elif (fetch[0:6] == "finish"):
-            op = "11111111"
-            print(op)
+        elif (line[0:4] == "sub "):
+            line = line.replace("jump ", "")
+            line = line.split(",")
+            Rx = int(line[0])
+            Ry = int(line[1])
+            Rz = int(line[2])
+
+            op = "0110"
+            print("P " + op + " " + Rx + " " + Ry + " " + Rz)
 
 
 def simulate(I, Nsteps, debug_mode, Memory):
