@@ -12,34 +12,34 @@ For both Code parts, the initalize memory is considered to start from zero.
 There is 4 dedicated memory slots for the registers in memory that are unreachable from lw/sw instructions.
 
 Instructions=>
-init Rx imm
+init Rx, imm
 	MC: P|1 0|I I|Rx|I I
 	*Note: Rx can only be $r0 and $r1 => address for imm to be stored
 	       Immediate is broken into 2 parts so the final immediate = IIII
 bez Rx
 	MC: P|1 1|X X|Rx|X X
 	*Note: Rx can only be $r0 and $r1 => jump distance; $r0 == 0 then the jump is done, otherwise ignore
-add Rx Ry
+add Rx, Ry
 	MC: P|0 0 0 0|Rx|Ry Ry
 	*Note: Rx can only be $r0 and $r1; Ry = $r0, $r1, $r2, $r3; Sum is stored in Ry
-slt Rx Ry
+slt Rx, Ry
 	MC: P|0 0 0 1|Rx|Ry Ry
 	*Note: Rx can only be $r0 and $r1; Ry = $r0, $r1, $r2, $r3; puts value at Rx (Rx = Rx <? Ry)
-lw Ry Rx
+lw Ry, Rx
 	MC: P|0 0 1 1|Rx|Ry Ry  
 	*Note: Ry = $r0 or $r1 as destination; Rx can only be $r0 and $r1; Memory address is reached from the value stored in Rx register; X does not matter;
-sw Ry Rx
+sw Ry, Rx
 	MC: P|0 0 1 0|Rx|Ry Ry
 	*Note: Ry = $r0 or $r1's value stored; Memory address is reached from the value stored in Rx register;
-XOR Rx Ry
+XOR Rx, Ry
 	MC: P|0 1 0 0|Rx|Ry Ry
 	*Note: Rx can only be $r0 and $r1; Ry = $r0, $r1, $r2, $r3; puts value at Ry (Ry = Rx XOR Ry)
-AND Rx Ry
+AND Rx, Ry
 	MC: P|0 1 0 1|Rx|Ry Ry
 	*Note: Rx can only be $r0 and $r1; Ry = $r0, $r1, $r2, $r3; puts value at Rx (Rx = Rx AND Ry)
 srl Rx
 	MC: P|0 1 1 1|X|Rx Rx
 	*Note: Barrel shifts right Rx; X does not matter
-sub Rx Ry Rz
+sub Rx, Ry, Rz
 	MC: P|0 1 1 0|Rx|Ry|Rz
 	*Note: Rx, Ry, Rz can only be $r0 and $r1; Rz = Rx - Ry
