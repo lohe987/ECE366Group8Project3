@@ -148,87 +148,97 @@ def assemble(I, Nlines):
         print(line)
         line = line.replace("$", "")
         line = line.replace("r", "")
+        line = line.replace("\n", "")
+        line = line.replace("\t", "")
 
-        if (line[0:5] == "init"):
-            line = line.replace("init ", "")
+        splitLine = line.split("#")
+        if (len(splitLine) == 2):
+            line = splitLine[0].replace(" ", "") # remove comments
+        else:
+            line = splitLine[0].replace(" ", "")
+
+        if (line[0:4] == "init"):
+            line = line.replace("init", "")
             line = line.split(",")
             R = format(int(line[0]), "02b")
             imm = str(format(int(line[1]), "04b"))
             op = "10"
             print("P " + op + " " + imm[0:3] + " " + R + " " + imm[2:4])
 
-        elif (line[0:5] == "bez "):
-            line = line.replace("bez ", "")
+        elif (line[0:3] == "bez"):
+            line = line.replace("bez", "")
             R = format(int(line), "01b")
             op = "11"
             print("P " + op + " XX " + R + " XX ")
 
-        elif (line[0:5] == "add "):
-            line = line.replace("add ", "")
+        elif (line[0:3] == "add"):
+            line = line.replace("add", "")
             line = line.split(",")
             Rx = format(int(line[0]), "01b")
             Ry = format(int(line[1]), "02b")
             op = "0000"
             print("P " + op + " " + Rx + " " + Ry)
 
-        elif (line[0:5] == "slt "):
-            line = line.replace("slt ", "")
+        elif (line[0:3] == "slt"):
+            line = line.replace("slt", "")
             line = line.split(",")
             Ry = format(int(line[0]), "01b")
             Rx = format(int(line[1]), "02b")
             op = "0001"
             print("P " + op + " " + Rx + " " + Ry)
 
-        elif (line[0:4] == "lw "):
-            line = line.replace("lw ", "")
+        elif (line[0:2] == "lw"):
+            line = line.replace("lw", "")
             line = line.split(",")
             Ry = format(int(line[0]), "02b")
             Rx = format(int(line[1]), "01b")
             op = "0011"
             print("P " + op + " " + Rx + " " + Ry)
 
-        elif (line[0:4] == "sw "):
-            line = line.replace("sw ", "")
+        elif (line[0:2] == "sw"):
+            line = line.replace("sw", "")
             line = line.split(",")
             Ry = format(int(line[0]), "02b")
             Rx = format(int(line[1]), "01b")
             op = "0010"
             print ("P " + op + " " + Rx + " " + Ry)
 
-        elif (line[0:5] == "XOR "):
-            line = line.replace("XOR ", "")
+        elif (line[0:3] == "XOR"):
+            line = line.replace("XOR", "")
             line = line.split(",")
             Rx = format(int(line[0]), "01b")
             Ry = format(int(line[1]), "02b")
             op = "0100"
             print ("P " + op + " " + Rx + " " + Ry)
 
-        elif (line[0:5] == "AND "):  # why "slt0" instead of "sltR0" ?
-            line = line.replace("AND ", "")
+        elif (line[0:3] == "AND"):  # why "slt0" instead of "sltR0" ?
+            line = line.replace("AND", "")
             line = line.split(",")
             Rx = format(int(line[0]), "01b")
             Ry = format(int(line[1]), "02b")
             op = "0101"
             print ("P " + op + " " + Rx + " " + Ry)
 
-        elif (line[0:5] == "srl "):
-            line = line.replace("srl ", "")
+        elif (line[0:3] == "srl"):
+            line = line.replace("srl", "")
             line = line.split(",")
             Rx = format(int(line[0]), "02b")
 
             op = "0111"
             print("P " + op + " X " + Rx)
 
-        elif (line[0:5] == "sub "):
-            line = line.replace("sub ", "")
+        elif (line[0:3] == "sub"):
+            line = line.replace("sub", "")
             line = line.split(",")
-            Rx = int(line[0])
-            Ry = int(line[1])
-            Rz = int(line[2])
+            Rx = str(int(line[0]))
+            Ry = str(int(line[1]))
+            Rz = str(int(line[2]))
 
             op = "0110"
             print("P " + op + " " + Rx + " " + Ry + " " + Rz)
 
+        else:
+            print("PLEASE FIX")
 
 def simulate(I, Nsteps, debug_mode, Memory):
     print("ECE366 Fall 2018 FJsquared: Simulator")
