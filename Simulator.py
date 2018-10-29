@@ -73,8 +73,8 @@ def disassemble(I, Nlines):
 
             # Disassembling it to: lw imm (unsigned)
             disassembled[0] = "lw "
-            disassembled[1] = "$r" + str(int(format(int(binaryInput[2], 2)))) + ", "
-            disassembled[2] = "$r" + str(int(format(int(binaryInput[3], 2))))
+            disassembled[2] = "$r" + str(int(format(int(binaryInput[2], 2))))
+            disassembled[1] = "$r" + str(int(format(int(binaryInput[3], 2)))) + ", "
 
             print(disassembled[0] + disassembled[1] + disassembled[2])
 
@@ -84,8 +84,8 @@ def disassemble(I, Nlines):
 
             # Disassembling it to: sw imm (unsigned)
             disassembled[0] = "sw "
-            disassembled[1] = "$r" + str(int(format(int(binaryInput[2], 2)))) + ", "
-            disassembled[2] = "$r" + str(int(format(int(binaryInput[3], 2))))
+            disassembled[2] = "$r" + str(int(format(int(binaryInput[2], 2))))
+            disassembled[1] = "$r" + str(int(format(int(binaryInput[3], 2)))) + ", "
 
             print(disassembled[0] + disassembled[1] + disassembled[2])
 
