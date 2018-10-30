@@ -254,6 +254,7 @@ def simulate(I, Nsteps, debug_mode, Memory):
         DIC += 1
 
         if (debug_mode):
+            print("\n***NEXT INSTRUCTION***")
             print(fetch)
         fetch = fetch.replace("$", "")  # Delete all the '$' to make things simpler
         fetch = fetch.replace("r", "")  # Delete all the 'r' to make things simpler
@@ -279,7 +280,7 @@ def simulate(I, Nsteps, debug_mode, Memory):
             fetch = fetch.replace("bez", "")
             R = int(fetch)
             if (Reg[0] == 0):
-                PC = PC + R
+                PC = PC + Reg[R]
             else:
                 PC += 1
         elif (fetch[0:3] == "add"):  # DONE
@@ -303,9 +304,9 @@ def simulate(I, Nsteps, debug_mode, Memory):
             else:
                 Reg[Rx] = 0
 
-                PC += 1
-        elif (fetch[0:3] == "XOR"):  # DONE
-            fetch = fetch.replace("XOR", "")
+            PC += 1
+        elif (fetch[0:3] == "xor"):  # DONE
+            fetch = fetch.replace("xor", "")
             fetch = fetch.split(",")
             Rx = int(fetch[0])
             Ry = int(fetch[1])
@@ -323,39 +324,28 @@ def simulate(I, Nsteps, debug_mode, Memory):
             fetch = fetch.split(",")
             Ry = int(fetch[0])
             Rx = int(fetch[1])
-            Memory[Reg[Ry]] = Reg[Rx]
+            Memory[Reg[Rx]] = Reg[Ry]
             PC += 1
-        elif (fetch[0:4] == "slt0"):  # why "slt0" instead of "sltR0" ?
-            # --> because all the 'R' is deleted at fetch to make things simplier.
-            fetch = fetch.replace("slt0 ", "")
+        elif (fetch[0:3] == "and"):  # DONE
+            fetch = fetch.replace("and", "")
             fetch = fetch.split(",")
             Rx = int(fetch[0])
             Ry = int(fetch[1])
-            if (Reg[Rx] < Reg[Ry]):
-                Reg[0] = 1
-            else:
-                Reg[0] = 0
+            Reg[Rx] = Reg[Rx] and Reg[Ry]
             PC += 1
-        elif (fetch[0:4] == "bez0"):
-            fetch = fetch.replace("bez0 ", "")
+        elif (fetch[0:3] == "srl"): # DONE
+            fetch = fetch.replace("srl", "")
+            Rx = int(fetch)
+            Reg[Rx] = Reg[Rx] >> 1
+            PC += 1
+        elif (fetch[0:3] == "sub"): # DONE
+            fetch = fetch.replace("sub", "")
             fetch = fetch.split(",")
-            imm = int(fetch[0])
-            if (Reg[0] == 0):
-                PC = PC + imm
-            else:
-                PC += 1
-        elif (fetch[0:4] == "jump"):
-            fetch = fetch.replace("jump ", "")
-            fetch = fetch.split(",")
-            imm = int(fetch[0])
-            if (imm == 0):
-                finished = True
-            else:
-                PC = PC + imm
-
-        elif (fetch[0:6] == "finish"):
-            finished = True
-
+            Rx = int(fetch[0])
+            Ry = int(fetch[1])
+            Rz = int(fetch[2])
+            Reg[Rz] = Reg[Rx] - Reg[Ry]
+            PC += 1
         if (debug_mode):
             if ((DIC % Nsteps) == 0):  # print stats every Nsteps
                 print("Registers R0-R3: ", Reg)
@@ -370,7 +360,7 @@ def simulate(I, Nsteps, debug_mode, Memory):
         print("******** Simulation finished *********")
         print("Dynamic Instr Count: ", DIC)
         print("Registers R0-R3: ", Reg)
-        # print("Memory :",Memory)
+        print("Memory :",Memory)
 
         data = open("d_mem.txt", "w")  # Write data back into d_mem.txt
         for i in range(len(Memory)):
