@@ -78,16 +78,16 @@ def disassemble(I, Nlines):
 
             print(disassembled[0] + disassembled[1] + disassembled[2])
 
-        elif (line[1:5] == '0010'):  # sw: 0010
-            # Splitting the line to: P|0 0 1 0|Rx|Ry Ry
-            binaryInput = [line[0], line[1:5], line[5], line[6:8]]
+        elif(line[1:5] == '0010'):  # sw: 0010
+                # Splitting the line to: P|0 0 1 0|Rx|Ry Ry
+                binaryInput = [line[0], line[1:5], line[5], line[6:8]]
 
-            # Disassembling it to: sw imm (unsigned)
-            disassembled[0] = "sw "
-            disassembled[2] = "$r" + str(int(format(int(binaryInput[2], 2))))
-            disassembled[1] = "$r" + str(int(format(int(binaryInput[3], 2)))) + ", "
+                # Disassembling it to: sw imm (unsigned)
+                disassembled[0] = "sw "
+                disassembled[2] = "$r" + str(int(format(int(binaryInput[2], 2))))
+                disassembled[1] = "$r" + str(int(format(int(binaryInput[3], 2)))) + ", "
 
-            print(disassembled[0] + disassembled[1] + disassembled[2])
+                print(disassembled[0] + disassembled[1] + disassembled[2])
 
         elif (line[1:5] == '0100'):  # xor: 0100
             # Splitting the line to: P|0 1 0 0|Rx|Ry Ry
@@ -153,7 +153,7 @@ def assemble(I, Nlines):
 
         splitLine = line.split("#")
         if (len(splitLine) == 2):
-            line = splitLine[0].replace(" ", "") # remove comments
+            line = splitLine[0].replace(" ", "")  # remove comments
         else:
             line = splitLine[0].replace(" ", "")
 
@@ -201,7 +201,7 @@ def assemble(I, Nlines):
             Ry = format(int(line[0]), "02b")
             Rx = format(int(line[1]), "01b")
             op = "0010"
-            print ("P " + op + " " + Rx + " " + Ry)
+            print("P " + op + " " + Rx + " " + Ry)
 
         elif (line[0:3] == "XOR"):
             line = line.replace("XOR", "")
@@ -209,7 +209,7 @@ def assemble(I, Nlines):
             Rx = format(int(line[0]), "01b")
             Ry = format(int(line[1]), "02b")
             op = "0100"
-            print ("P " + op + " " + Rx + " " + Ry)
+            print("P " + op + " " + Rx + " " + Ry)
 
         elif (line[0:3] == "AND"):  # why "slt0" instead of "sltR0" ?
             line = line.replace("AND", "")
@@ -217,7 +217,7 @@ def assemble(I, Nlines):
             Rx = format(int(line[0]), "01b")
             Ry = format(int(line[1]), "02b")
             op = "0101"
-            print ("P " + op + " " + Rx + " " + Ry)
+            print("P " + op + " " + Rx + " " + Ry)
 
         elif (line[0:3] == "srl"):
             line = line.replace("srl", "")
@@ -240,10 +240,11 @@ def assemble(I, Nlines):
         else:
             print("PLEASE FIX")
 
+
 def simulate(I, Nsteps, debug_mode, Memory):
-    print("ECE366 Fall 2018 FJsquared: Simulator")
+    print("ECE366 Fall 2018 ISA Design: Simulator")
     print()
-    PC = 0              # Program-counter
+    PC = 0  # Program-counter
     DIC = 0
     Reg = [0, 0, 0, 0]  # 4 registers, init to all 0
     print("******** Simulation starts *********")
@@ -251,60 +252,77 @@ def simulate(I, Nsteps, debug_mode, Memory):
     while (not (finished)):
         fetch = I[PC]
         DIC += 1
+
         if (debug_mode):
             print(fetch)
-        fetch = fetch.replace("R", "")  # Delete all the 'R' to make things simpler
-        if (fetch[0:4] == "init"):
-            fetch = fetch.replace("init ", "")
+        fetch = fetch.replace("$", "")  # Delete all the '$' to make things simpler
+        fetch = fetch.replace("r", "")  # Delete all the 'r' to make things simpler
+        fetch = fetch.replace(" ", "")  # Delete all the ' ' to make things simpler
+        fetch = fetch.replace("\t", "")  # Delete all the '\t' to make things simpler
+
+        splitLine = fetch.split("#")
+        if (len(splitLine) == 2):
+            fetch = splitLine[0].replace(" ", "")  # remove comments
+        else:
+            fetch = splitLine[0].replace(" ", "")
+
+        if (fetch[0:4] == "init"):  # DONE
+
+            # Extracting data values
+            fetch = fetch.replace("init", "")
             fetch = fetch.split(",")
             R = int(fetch[0])
             imm = int(fetch[1])
             Reg[R] = imm
             PC += 1
-        elif (fetch[0:4] == "addi"):
-            fetch = fetch.replace("addi ", "")
-            fetch = fetch.split(",")
-            R = int(fetch[0])
-            imm = int(fetch[1])
-            Reg[R] = Reg[R] + imm
-            PC += 1
-        elif (fetch[0:4] == "add "):
-            fetch = fetch.replace("add ", "")
-            fetch = fetch.split(",")
-            Rx = int(fetch[0])
-            Ry = int(fetch[1])
-            Reg[Rx] = Reg[Rx] + Reg[Ry]
-            PC += 1
-        elif (fetch[0:4] == "sub "):
-            fetch = fetch.replace("sub ", "")
+        elif (fetch[0:3] == "bez"):  # DONE
+            fetch = fetch.replace("bez", "")
+            R = int(fetch)
+            if (Reg[0] == 0):
+                PC = PC + R
+            else:
+                PC += 1
+        elif (fetch[0:3] == "add"):  # DONE
+            fetch = fetch.replace("add", "")
             fetch = fetch.split(",")
             Rx = int(fetch[0])
             Ry = int(fetch[1])
-            Reg[Rx] = Reg[Rx] - Reg[Ry]
+            Reg[Ry] = Reg[Rx] + Reg[Ry]
             PC += 1
-        elif (fetch[0:4] == "xor "):
-            fetch = fetch.replace("xor ", "")
+        elif (fetch[0:3] == "slt"):  # DONE
+            fetch = fetch.replace("slt", "")
+            fetch = fetch.split(",")
+            Rx = int(fetch[0])
+            Ry = int(fetch[1])
+            compVal = Reg[Ry] - Reg[Rx]
+
+
+            if (compVal > 0):
+                Reg[Rx] = 1
+
+            else:
+                Reg[Rx] = 0
+
+                PC += 1
+        elif (fetch[0:3] == "XOR"):  # DONE
+            fetch = fetch.replace("XOR", "")
             fetch = fetch.split(",")
             Rx = int(fetch[0])
             Ry = int(fetch[1])
             Reg[Rx] = Reg[Rx] ^ Reg[Ry]
             PC += 1
-        elif (fetch[0:4] == "load"):
-            fetch = fetch.replace("load ", "")
-            fetch = fetch.replace("(", "")
-            fetch = fetch.replace(")", "")
+        elif (fetch[0:2] == "lw"):  # DONE
+            fetch = fetch.replace("lw", "")
             fetch = fetch.split(",")
-            Rx = int(fetch[0])
-            Ry = int(fetch[1])
+            Ry = int(fetch[0])
+            Rx = int(fetch[1])
             Reg[Rx] = Memory[Ry]
             PC += 1
-        elif (fetch[0:4] == "stre"):
-            fetch = fetch.replace("stre ", "")
-            fetch = fetch.replace("(", "")
-            fetch = fetch.replace(")", "")
+        elif (fetch[0:2] == "sw"):  # DONE
+            fetch = fetch.replace("sw", "")
             fetch = fetch.split(",")
-            Rx = int(fetch[0])
-            Ry = int(fetch[1])
+            Ry = int(fetch[0])
+            Rx = int(fetch[1])
             Memory[Reg[Ry]] = Reg[Rx]
             PC += 1
         elif (fetch[0:4] == "slt0"):  # why "slt0" instead of "sltR0" ?
@@ -337,6 +355,7 @@ def simulate(I, Nsteps, debug_mode, Memory):
 
         elif (fetch[0:6] == "finish"):
             finished = True
+
         if (debug_mode):
             if ((DIC % Nsteps) == 0):  # print stats every Nsteps
                 print("Registers R0-R3: ", Reg)
@@ -348,16 +367,16 @@ def simulate(I, Nsteps, debug_mode, Memory):
         else:
             continue
 
-    print("******** Simulation finished *********")
-    print("Dynamic Instr Count: ", DIC)
-    print("Registers R0-R3: ", Reg)
-    # print("Memory :",Memory)
+        print("******** Simulation finished *********")
+        print("Dynamic Instr Count: ", DIC)
+        print("Registers R0-R3: ", Reg)
+        # print("Memory :",Memory)
 
-    data = open("d_mem.txt", "w")  # Write data back into d_mem.txt
-    for i in range(len(Memory)):
-        data.write(format(Memory[i], "016b"))
-        data.write("\n")
-    data.close()
+        data = open("d_mem.txt", "w")  # Write data back into d_mem.txt
+        for i in range(len(Memory)):
+            data.write(format(Memory[i], "016b"))
+            data.write("\n")
+        data.close()
 
 
 def main():
@@ -373,7 +392,7 @@ def main():
     print(" 2 = disassembler")
     print(" 3 = assembler")
     mode = int(input("Please enter the mode of program: "))
-    print("Mode selected: ", end = "")
+    print("Mode selected: ", end="")
     if (mode == 1):
         print("Simulator")
         print("Simulator has 2 modes: ")
@@ -423,3 +442,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
