@@ -59,11 +59,11 @@ init $r0, -8	 #r0 = -8
 add $r0, $r1	 #r1= r0 + r1 = - 8 - 20
 init $r0, 0		 #r0 = 0
 bez $r1			 #imm would be number to reach sum  DONE -28
-init $r0, 4		 #r0 = 4, r0 to 4 address !!! mod JUMP LOCATION !!!
-init $r1, 5		 #r1 = 5
-lw $r1, $r1		 #r1 = value of 0x5
-lw $r0, $r0		 #r0 = value of 0x4
-slt $r1, $r1	 #r0 = r1<r0
+init $r1, 4		 #r1 = 4, !!! mod JUMP LOCATION !!!
+init $r0, 5		 #r0 = 5
+lw $r1, $r1		 #r1 = value of 0x4
+lw $r0, $r0		 #r0 = value of 0x5
+slt $r0, $r1	 #r0 = r0<r1
 init $r1, 7		 # 7 = smallj JUMP DISTANCE!!!!!!!!!!! 7
 bez $r1			 #skip if r0 == 0
 init $r0, 0		 #r0 = 3
