@@ -356,6 +356,8 @@ def simulate(I, Nsteps, debug_mode, Memory):
                 # Too much cluster
                 input("Press any key to continue")
                 print()
+        elif (finished) :
+            print("Program success")
         else:
             continue
 
@@ -370,7 +372,7 @@ def simulate(I, Nsteps, debug_mode, Memory):
             data.write(format(Memory[i], "016b"))
             data.write("\n")
         data.close()
-    print("Simulation finished!!!!")
+    
 
 def main():
     instr_file = open("i_mem.txt", "r")
