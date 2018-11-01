@@ -281,6 +281,8 @@ def simulate(I, Nsteps, debug_mode, Memory):
             R = int(fetch)
             if (Reg[0] == 0):
                 PC = PC + Reg[R]
+                if (Reg[R] == 0):
+                    finished = True
             else:
                 PC += 1
         elif (fetch[0:3] == "add"):  # DONE
@@ -317,7 +319,7 @@ def simulate(I, Nsteps, debug_mode, Memory):
             fetch = fetch.split(",")
             Ry = int(fetch[0])
             Rx = int(fetch[1])
-            Reg[Rx] = Memory[Ry]
+            Reg[Ry] = Memory[Reg[Rx]]
             PC += 1
         elif (fetch[0:2] == "sw"):  # DONE
             fetch = fetch.replace("sw", "")
@@ -361,13 +363,14 @@ def simulate(I, Nsteps, debug_mode, Memory):
         print("Dynamic Instr Count: ", DIC)
         print("Registers R0-R3: ", Reg)
         print("Memory :",Memory)
+        print("PC: ", PC)
 
         data = open("d_mem.txt", "w")  # Write data back into d_mem.txt
         for i in range(len(Memory)):
             data.write(format(Memory[i], "016b"))
             data.write("\n")
         data.close()
-
+    print("Simulation finished!!!!")
 
 def main():
     instr_file = open("i_mem.txt", "r")
@@ -432,4 +435,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
