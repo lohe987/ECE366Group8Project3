@@ -1,6 +1,6 @@
 init $r0, 1		 #r0 = 1
 init $r1, 2		 #r1 = 2
-sw $r0, $r1		 #0x2 = 1 <= r0 ooooooooooooooooo
+sw $r0, $r1		 #0x2 = 1 <= r0 
 init $r0, 5		 #r0 = 5
 init $r1, 3		 #r1 = 3
 sw $r0, $r1		 #0x3 = 5, loop counter for sum
@@ -20,7 +20,7 @@ init $r1, 7		 #r1 = 7
 sw $r0, $r1		 #0x7 = -Q <= r0, The -Q counter
 init $r0, 1		 #r0 = 1
 init $r1, 5		 #r1 = 5
-sw $r0, $r1		 #0x5 = 1, holds sum of numbers for sum loop ooooooooooooooooo 
+sw $r0, $r1		 #0x5 = 1, holds sum of numbers for sum loop 
 init $r1, 5		 #r1 = 5 = end JUMP DISTANCE!!!!!!!!!!!!!! 78 !!! loop JUMP LOCATION !!!
 add $r1, $r1	 #r1 = 5 + 5 = 10
 add $r1, $r1	 #r1 = 10 + 10 = 20
