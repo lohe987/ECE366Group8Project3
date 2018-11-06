@@ -18,6 +18,17 @@ def findParity(line):
         line = str("1" + line)
     print(line) # Print the result of the given instruction
                 
+def fromMem(line):
+    if(line > 32768):
+        return line - 65536
+    else:
+        return line
+
+def toMem(regVal):
+    if(regVal < 0):
+        return 65536  + regVal
+    else:
+        return regVal
 
 def disassemble(I, Nlines):     # Check imm
     print("ECE366 Fall 2018 \nFJsquared: Disassembler")
@@ -279,13 +290,13 @@ def simulate(I, Nsteps, debug_mode, Memory):
         elif (fetch[1:5] == '0011'):  # DONE # lw: 0011
             Rx = int(fetch[5])
             Ry = int(fetch[6] + fetch[7], 2)
-            Reg[Rx] = Memory[Reg[Ry]]
+            Reg[Rx] = fromMem(Memory[Reg[Ry]])
             PC += 1
             
         elif(fetch[1:5] == '0010'):  # DONE # sw: 0010
             Rx = int(fetch[5])
             Ry = int(format(int(fetch[6] + fetch[7], 2)))
-            Memory[int(Reg[Ry])] = Reg[Rx]
+            Memory[int(Reg[Ry])] = toMem(Reg[Rx])
             PC += 1
             
         elif (fetch[1:5] == '0101'):  # DONE # and: 0101
@@ -323,7 +334,12 @@ def simulate(I, Nsteps, debug_mode, Memory):
         print("******** Simulation finished *********")
         print("Dynamic Instr Count: ", DIC)
         print("Registers R0-R3: ", Reg)
-        print("Memory :",Memory)
+        print("Memory :[", end = '')
+        for i in range(len(Memory)):
+            print(fromMem(Memory[i]), end='')
+            if(i != len(Memory) - 1):
+                print(", ", end='')
+        print("]")
         print("PC: ", PC)
 
         data = open("d_mem.txt", "w")  # Write data back into d_mem.txt
