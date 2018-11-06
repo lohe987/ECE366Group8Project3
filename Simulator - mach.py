@@ -35,7 +35,7 @@ def disassemble(I, Nlines):     # Check imm
             imm = line[3] + line[4] + line[6] + line[7]
             imm = format(int(imm, 2))
             if (line[3] == '1'): # imm = 1110 = -2; 16 - 14 = 2
-                imm = 16 - imm
+                imm = 16 - int(imm)
                 imm = "-" + str(imm)
             else:
                 imm = str(imm)
@@ -102,7 +102,7 @@ def disassemble(I, Nlines):     # Check imm
             rx = "$r" + str(line[5]) + ", "
             ry = "$r" + str(line[6]) + ", "
             rz = "$r" + str(line[7])
-            print(op + rx + ry)
+            print(op + rx + ry + rz)
     print("******** COMPLETE OPERATION *********")
 
 
@@ -129,8 +129,8 @@ def assemble(I, Nlines):    # Check imm
             line = line.replace("init", "")
             line = line.split(",")
             R = format(int(line[0]), "01b")
-            if(line[1] < 0):
-                line[1] = 16 + line[1] #line[1] = -1 => 15 = 1111
+            if(int(line[1]) < 0):
+                line[1] = 16 + int(line[1]) #line[1] = -1 => 15 = 1111
             imm = str(format(int(line[1]), "04b"))
             op = "10"
             lineEdit = str(op + imm[0:2] + R + imm[2:4])
@@ -228,7 +228,7 @@ def simulate(I, Nsteps, debug_mode, Memory):
     print("******** Simulation starts *********")
     finished = False
     while (not (finished)):
-        fetch = I[PC]
+        fetch = I[PC - 1]
         DIC += 1
 
         if (debug_mode):
@@ -238,16 +238,17 @@ def simulate(I, Nsteps, debug_mode, Memory):
         if (fetch[1:3] == "10"): # DONE # init: 10 
             R = int(fetch[5])
             imm = fetch[3] + fetch[4] + fetch[6] + fetch[7]
-            imm = format(int(imm),2)
+            imm = int(format(int(imm,2)))
+
             if (fetch[3] == '1'):
                 imm = 16 - imm
-            Reg[R] = imm
+            Reg[R] = str(imm)
             PC += 1
             
         elif (fetch[1:3] == '11'):   # DONE # bez: 11
             R = int(fetch[5])
             if (Reg[0] == 0):
-                PC = PC + Reg[R]
+                PC = PC + int(Reg[R])
                 if (Reg[R] == 0):   # Dead loop
                     finished = True
             else:
@@ -278,13 +279,13 @@ def simulate(I, Nsteps, debug_mode, Memory):
         elif (fetch[1:5] == '0011'):  # DONE # lw: 0011
             Rx = int(fetch[5])
             Ry = int(fetch[6] + fetch[7], 2)
-            Reg[Rx] = Memory[Reg[Ry]]
+            Reg[Rx] = Memory[int(Reg[Ry])]
             PC += 1
             
         elif(fetch[1:5] == '0010'):  # DONE # sw: 0010
             Rx = int(fetch[5])
-            Ry = int(fetch[6] + fetch[7], 2)
-            Memory[Reg[Ry]] = Reg[Rx]
+            Ry = int(format(int(fetch[6] + fetch[7], 2)))
+            Memory[int(Reg[Ry])] = Reg[Rx]
             PC += 1
             
         elif (fetch[1:5] == '0101'):  # DONE # and: 0101
@@ -303,7 +304,7 @@ def simulate(I, Nsteps, debug_mode, Memory):
             Rx = int(fetch[5])
             Ry = int(fetch[6])
             Rz = int(fetch[7])
-            Reg[Rz] = Reg[Rx] - Reg[Ry]
+            Reg[Rz] = int(Reg[Rx]) - int(Reg[Ry])
             PC += 1
             
         if (debug_mode):
