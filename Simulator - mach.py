@@ -33,7 +33,7 @@ def disassemble(I, Nlines):     # Check imm
             op = "init "
             R = "$r" + line[5] + ", "
             imm = line[3] + line[4] + line[6] + line[7]
-            imm = format(int(imm, 2)))
+            imm = format(int(imm, 2))
             if (line[3] == '1'): # imm = 1110 = -2; 16 - 14 = 2
                 imm = 16 - imm
                 imm = "-" + str(imm)
