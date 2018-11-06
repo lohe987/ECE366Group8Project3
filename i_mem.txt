@@ -6,7 +6,7 @@ init $r1, 3		 #r1 = 3
 sw $r0, $r1		 #0x3 = 5, loop counter for sum
 init $r0, 1		 #r0 = 1
 lw $r0, $r0		 #r0 = 0x1
-init $r1, 4	 #r1 = 4
+init $r1, 4	     #r1 = 4
 sw $r0, $r1		 #0x4 = r0 = Q , loop counter for mod
 init $r0, 0		 #r0 = 0
 lw $r0, $r0		 #r0 = P

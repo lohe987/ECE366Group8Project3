@@ -5,7 +5,7 @@
 #                         output the state of each reg, and PC
 #            Normal mode: Execute program all at once
 
-def disassemble(I, Nlines):
+def disassemble(I, Nlines, assembly):
     print("ECE366 Fall 2018 \nFJsquared: Disassembler")
     print("-----------------")
     # print(I)

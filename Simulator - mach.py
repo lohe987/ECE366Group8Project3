@@ -33,12 +33,12 @@ def disassemble(I, Nlines):     # Check imm
             op = "init "
             R = "$r" + line[5] + ", "
             imm = line[3] + line[4] + line[6] + line[7]
-            imm = str(format(int(imm, 2)))
-            #if (line[3] == '-'):
-            #    imm = -1 * int(format(int(imm, 2)))
-            #    imm = str(int(imm))
-            #else:
-            #    imm = str(int(format(int(imm, 2))))
+            imm = format(int(imm, 2)))
+            if (line[3] == '1'): # imm = 1110 = -2; 16 - 14 = 2
+                imm = 16 - imm
+                imm = "-" + str(imm)
+            else:
+                imm = str(imm)
             print(op + R + imm)
 
         elif (line[1:3] == '11'):   # DONE # bez: 11
@@ -125,10 +125,12 @@ def assemble(I, Nlines):    # Check imm
         else:
             line = splitLine[0].replace(" ", "")
 
-        if (line[0:4] == "init"):   # DONE
+        if (line[0:4] == "init"):   # DONE init Rx, Imm P 10 00 00
             line = line.replace("init", "")
             line = line.split(",")
             R = format(int(line[0]), "01b")
+            if(line[1] < 0):
+                line[1] = 16 + line[1] #line[1] = -1 => 15 = 1111
             imm = str(format(int(line[1]), "04b"))
             op = "10"
             lineEdit = str(op + imm[0:2] + R + imm[2:4])
@@ -235,11 +237,10 @@ def simulate(I, Nsteps, debug_mode, Memory):
         
         if (fetch[1:3] == "10"): # DONE # init: 10 
             R = int(fetch[5])
-            imm = fetch[4] + fetch[6] + fetch[7]
-            if (fetch[3] == '-'):
-                imm = -1 * int(format(int(imm, 2)))
-            else:
-                imm = int(format(int(imm, 2)))
+            imm = fetch[3] + fetch[4] + fetch[6] + fetch[7]
+            imm = format(int(imm),2)
+            if (fetch[3] == '1'):
+                imm = 16 - imm
             Reg[R] = imm
             PC += 1
             
