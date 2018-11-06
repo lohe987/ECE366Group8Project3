@@ -25,12 +25,12 @@ add Rx, Ry
 slt Rx, Ry
 	MC: P|0 0 0 1|Rx|Ry Ry
 	*Note: Rx can only be $r0 and $r1; Ry = $r0, $r1, $r2, $r3; puts value at Rx (Rx = Rx <? Ry)
-lw Ry, Rx
+lw Rx, Ry
 	MC: P|0 0 1 1|Rx|Ry Ry  
-	*Note: Ry = $r0 or $r1 as destination; Rx can only be $r0 and $r1; Memory address is reached from the value stored in Rx register; X does not matter;
-sw Ry, Rx
+	*Note: Rx = $r0 or $r1 as destination; Rx can only be $r0 and $r1; Memory address is reached from the value stored in Ry register; X does not matter;
+sw Rx, Ry
 	MC: P|0 0 1 0|Rx|Ry Ry
-	*Note: Ry = $r0 or $r1's value stored; Memory address is reached from the value stored in Rx register;
+	*Note: Rx = $r0 or $r1's value stored; Memory address is reached from the value stored in Ry register;
 XOR Rx, Ry
 	MC: P|0 1 0 0|Rx|Ry Ry
 	*Note: Rx can only be $r0 and $r1; Ry = $r0, $r1, $r2, $r3; puts value at Ry (Ry = Rx XOR Ry)
