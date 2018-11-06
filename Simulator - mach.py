@@ -241,7 +241,7 @@ def simulate(I, Nsteps, debug_mode, Memory):
             imm = int(format(int(imm,2)))
 
             if (fetch[3] == '1'):
-                imm = 16 - imm
+                imm = -16 + imm
             Reg[R] = int(imm)
             PC += 1
             
