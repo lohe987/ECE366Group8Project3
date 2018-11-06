@@ -228,7 +228,7 @@ def simulate(I, Nsteps, debug_mode, Memory):
     print("******** Simulation starts *********")
     finished = False
     while (not (finished)):
-        fetch = I[PC - 1]
+        fetch = I[PC]
         DIC += 1
 
         if (debug_mode):
@@ -242,13 +242,13 @@ def simulate(I, Nsteps, debug_mode, Memory):
 
             if (fetch[3] == '1'):
                 imm = 16 - imm
-            Reg[R] = str(imm)
+            Reg[R] = int(imm)
             PC += 1
             
         elif (fetch[1:3] == '11'):   # DONE # bez: 11
             R = int(fetch[5])
             if (Reg[0] == 0):
-                PC = PC + int(Reg[R])
+                PC = PC + Reg[R]
                 if (Reg[R] == 0):   # Dead loop
                     finished = True
             else:
@@ -279,7 +279,7 @@ def simulate(I, Nsteps, debug_mode, Memory):
         elif (fetch[1:5] == '0011'):  # DONE # lw: 0011
             Rx = int(fetch[5])
             Ry = int(fetch[6] + fetch[7], 2)
-            Reg[Rx] = Memory[int(Reg[Ry])]
+            Reg[Rx] = Memory[Reg[Ry]]
             PC += 1
             
         elif(fetch[1:5] == '0010'):  # DONE # sw: 0010
