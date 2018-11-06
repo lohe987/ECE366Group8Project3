@@ -350,61 +350,99 @@ def simulate(I, Nsteps, debug_mode, Memory):
 
 
 def main():
-    instr_file = open("i_mem.txt", "r")
-    data_file = open("d_mem.txt", "r")
     Memory = []
     debug_mode = False  # is machine in debug mode?
     Nsteps = 3  # How many cycle to run before output statistics
     Nlines = 0  # How many instrs total in input.txt
     Instruction = []  # all instructions will be stored here
-    print("Welcome to ECE366 ISA sample programs")
-    print(" 1 = simulator")
-    print(" 2 = disassembler")
-    print(" 3 = assembler")
-    mode = int(input("Please enter the mode of program: "))
-    print("Mode selected: ", end="")
-    if (mode == 1):
-        print("Simulator")
-        print("Simulator has 2 modes: ")
-        print(" 1] Normal execution")
-        print(" 2] Debug mode")
-        simMode = int(input("Please select simulator's mode: "))
-        if (simMode == 1):
-            debug_mode = False
-        elif (simMode == 2):
-            debug_mode = True
-            Nsteps = int(input("Debug Mode selected. Please enter # of debugging steps: "))
+    askAgain = True
+    while(askAgain):
+        print("\nWelcome to FJsquared's ISA Menu")
+        print(" 1 = simulator")
+        print(" 2 = disassembler")
+        print(" 3 = assembler")
+        mode = int(input("Please enter the mode of program: "))
+        print("\nMode selected: ", end="")
+        if (mode == 1):
+            print("Simulator")
+            print("\nSimulator has 2 modes: ")
+            print(" 1] Normal execution")
+            print(" 2] Debug mode")
+            simMode = int(input("Please select simulator's mode: "))
+            if (simMode == 1):
+                debug_mode = False
+            elif (simMode == 2):
+                debug_mode = True
+                Nsteps = int(input("Debug Mode selected. Please enter # of debugging steps: "))
+            else:
+                print("Error, unrecognized input. Try again.\n")
+                askAgain = True
+                mode = 4
+        elif (mode == 2):
+            print("Disassembler")
+        elif (mode == 3):
+            print("Assembler")
         else:
-            print("Error, unrecognized input. Exiting")
-            exit()
-    elif (mode == 2):
-        print("Disassembler")
-    elif (mode == 3):
-        print("Assembler")
-    else:
-        print("Error. Unrecognized mode. Exiting")
-        exit()
-    # mode = 1            # 1 = Simulation
-    # 2 = disassembler
-    # 3 = assembler
-    for line in instr_file:  # Read in instr
-        if (line == "\n" or line[0] == '#'):  # empty lines,comments ignored
-            continue
-        line = line.replace("\n", "")
-        Instruction.append(line)  # Copy all instruction into a list
-        Nlines += 1
+            print("\nError. Unrecognized mode. Try Again\n")
+            askAgain = True
+        # mode = 1            # 1 = Simulation
+        # 2 = disassembler
+        # 3 = assembler
+        # Which files are we looking at?
+        askProgram = True
+        program = 0
+        while(askProgram):
+            print("\nPlease input which program we are using: (1 or 2)")
+            program = input(">>")
+            if(program == '1'):
+                file1 = "p3_group_8_p1_imem.txt"
+                askProgram = False
+            elif(program == '2'):
+                file1 = "p3_group_8_p2_imem.txt"
+                askProgram = False
+            else:
+                print("\nError. Unrecognized program. Try again")
+        program = 'A'
+        askProgram = True
+        while (askProgram):
+            print("\nPlease input which data memory we are using: (A or B or C or D)")
+            program == input(">>")
+            if (program == 'A'):
+                file2 = "p3_group_8_dmem_A.txt"
+                askProgram = False
+            elif (program == 'B'):
+                file2 = "p3_group_8_dmem_B.txt"
+                askProgram = False
+            elif (program == 'C'):
+                file2 = "p3_group_8_dmem_C.txt"
+                askProgram = False
+            elif (program == 'D'):
+                file2 = "p3_group_8_dmem_D.txt"
+                askProgram = False
+            else:
+                print("\nError. Unrecognized data memory. Try again")
 
-    for line in data_file:  # Read in data memory
-        if (line == "\n" or line[0] == '#'):  # empty lines,comments ignored
-            continue
-        Memory.append(int(line, 2))
+        instr_file = open(file1, "r")
+        data_file = open(file2, "r")
 
-    if (mode == 1):  # Check wether to use disasembler or assembler or simulation
-        simulate(Instruction, Nsteps, debug_mode, Memory)
-    elif (mode == 2):
-        disassemble(Instruction, Nlines)
-    else:
-        assemble(Instruction, Nlines)
+        for line in instr_file:  # Read in instr
+            if (line == "\n" or line[0] == '#'):  # empty lines,comments ignored
+                continue
+            line = line.replace("\n", "")
+            Instruction.append(line)  # Copy all instruction into a list
+            Nlines += 1
+
+        for line in data_file:  # Read in data memory
+            if (line == "\n" or line[0] == '#'):  # empty lines,comments ignored
+                continue
+            Memory.append(int(line, 2))
+
+        if (mode == 1):  # Check wether to use disasembler or assembler or simulation
+            askAgain = simulate(Instruction, Nsteps, debug_mode, Memory)
+        elif (mode == 2):
+            askAgain = disassemble(Instruction, Nlines)
+        elif (mode == 3):
+            askAgain = assemble(Instruction, Nlines)
 
     instr_file.close()
     data_file.close()
