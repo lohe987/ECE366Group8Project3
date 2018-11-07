@@ -290,7 +290,7 @@ def simulate(I, Nsteps, debug_mode, Memory):
         elif (fetch[1:5] == '0011'):  # DONE # lw: 0011
             Rx = int(fetch[5])
             Ry = int(fetch[6] + fetch[7], 2)
-            Reg[Rx] = fromMem(Memory[Reg[Ry]])
+            Reg[Ry] = fromMem(Memory[Reg[Rx]])
             PC += 1
             
         elif(fetch[1:5] == '0010'):  # DONE # sw: 0010
