@@ -230,6 +230,7 @@ def assemble(I, Nlines):    # Check imm
     print("******** COMPLETE OPERATION *********")
 
 
+
 def simulate(I, Nsteps, debug_mode, Memory):
     print("ECE366 Fall 2018 ISA Design: Simulator")
     print()
@@ -242,9 +243,9 @@ def simulate(I, Nsteps, debug_mode, Memory):
         fetch = I[PC]
         DIC += 1
 
-        if (debug_mode):
-            print("\n***!!!!! NEXT INSTRUCTION !!!!!***")
-            print(fetch)
+        #if (debug_mode):
+        #    print("\n***!!!!! NEXT INSTRUCTION !!!!!***")
+        #   print(fetch)
         
         if (fetch[1:3] == "10"): # DONE # init: 10 
             R = int(fetch[5])
@@ -324,29 +325,50 @@ def simulate(I, Nsteps, debug_mode, Memory):
                 print("Program Counter : ", PC)
                 # print("Memory: ",Memory)   # Dont print memory atm.
                 # Too much cluster
-                input("Press any key to continue")
+                input("Press any enter to continue")
                 print()
         elif (finished) :
             print("Program success")
         else:
             continue
-
-        print("******** Simulation finished *********")
-        print("Dynamic Instr Count: ", DIC)
-        print("Registers R0-R3: ", Reg)
-        print("Memory :[", end = '')
-        for i in range(len(Memory)):
-            print(fromMem(Memory[i]), end='')
-            if(i != len(Memory) - 1):
-                print(", ", end='')
-        print("]")
-        print("PC: ", PC)
-
+        if(not debug_mode):
+            print("******** Simulation finished *********")
+            print("Dynamic Instr Count: ", DIC)
+            print("Registers R0-R3: ", Reg)
+            print("Memory :[", end = '')
+            for i in range(len(Memory)):
+                print(fromMem(Memory[i]), end='')
+                if(i != len(Memory) - 1):
+                    print(", ", end='')
+            print("]")
+            print("PC: ", PC)
+        else:
+            if ((DIC % Nsteps) == 0):  # print stats every Nsteps
+                print("******** Simulation finished *********")
+                print("Dynamic Instr Count: ", DIC)
+                print("Registers R0-R3: ", Reg)
+                print("Memory :[", end='')
+                for i in range(len(Memory)):
+                    print(fromMem(Memory[i]), end='')
+                    if (i != len(Memory) - 1):
+                        print(", ", end='')
+                print("]")
+                print("PC: ", PC)
         data = open("d_mem.txt", "w")  # Write data back into d_mem.txt
         for i in range(len(Memory)):
             data.write(format(Memory[i], "016b"))
             data.write("\n")
         data.close()
+    while(True):
+        print("\nDo you want to go back to the menu? (Y/N)")
+        prompt = input(">>")
+        if(prompt == 'y'):
+            return True
+        elif(prompt == 'n'):
+            print("\nGoodbye!\n")
+            return False
+        else:
+            print("Unknown selection. Please pick Y or N.\n")
 
 
 def main():
@@ -446,6 +468,7 @@ def main():
 
     instr_file.close()
     data_file.close()
+    exit()
 
 
 if __name__ == "__main__":
