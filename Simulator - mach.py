@@ -268,8 +268,8 @@ def simulate(I, Nsteps, debug_mode, Memory):
         #if (debug_mode):
         #    print("\n***!!!!! NEXT INSTRUCTION !!!!!***")
         #   print(fetch)
-        
-        if (fetch[1:3] == "10"): # DONE # init: 10 
+
+        if (fetch[1:3] == "10"): # DONE # init: 10
             R = int(fetch[5])
             imm = fetch[3] + fetch[4] + fetch[6] + fetch[7]
             imm = int(format(int(imm,2)))
@@ -278,7 +278,7 @@ def simulate(I, Nsteps, debug_mode, Memory):
                 imm = -16 + imm
             Reg[R] = int(imm)
             PC += 1
-            
+
         elif (fetch[1:3] == '11'):   # DONE # bez: 11
             R = int(fetch[5])
             if (Reg[0] == 0):
@@ -287,13 +287,13 @@ def simulate(I, Nsteps, debug_mode, Memory):
                     finished = True
             else:
                 PC += 1
-                
+
         elif (fetch[1:5] == '0000'):  # DONE # add: 0000
             Rx = int(fetch[5])
             Ry = int(fetch[6] + fetch[7], 2)
             Reg[Ry] = Reg[Rx] + Reg[Ry]
             PC += 1
-            
+
         elif (fetch[1:5] == '0001'):  # DONE # slt: 0001
             Rx = int(fetch[5])
             Ry = int(fetch[6] + fetch[7], 2)
@@ -303,44 +303,44 @@ def simulate(I, Nsteps, debug_mode, Memory):
             else:
                 Reg[Rx] = 0
             PC += 1
-            
+
         elif (fetch[1:5] == '0100'):  # DONE # xor: 0100
             Rx = int(fetch[5])
             Ry = int(fetch[6] + fetch[7], 2)
             Reg[Rx] = Reg[Rx] ^ Reg[Ry]
             PC += 1
-            
+
         elif (fetch[1:5] == '0011'):  # DONE # lw: 0011
             Rx = int(fetch[5])
             Ry = int(fetch[6] + fetch[7], 2)
             Reg[Ry] = fromMem(Memory[Reg[Rx]])
             PC += 1
-            
+
         elif(fetch[1:5] == '0010'):  # DONE # sw: 0010
             Rx = int(fetch[5])
             Ry = int(format(int(fetch[6] + fetch[7], 2)))
             Memory[int(Reg[Ry])] = toMem(Reg[Rx])
             PC += 1
-            
+
         elif (fetch[1:5] == '0101'):  # DONE # and: 0101
             Rx = int(fetch[5])
             Ry = int(fetch[6] + fetch[7], 2)
             Reg[Rx] = Reg[Rx] and Reg[Ry]
             PC += 1
-            
+
         elif (fetch[1:5] == '0111'):  # DONE # srl: 0111
             Rx = int(fetch[5])
             Ry = int(fetch[6] + fetch[7], 2)
             Reg[Rx] = Reg[Rx] >> 1
             PC += 1
-            
+
         elif (fetch[1:5] == '0110'):  # DONE # sub: 0110
             Rx = int(fetch[5])
             Ry = int(fetch[6])
             Rz = int(fetch[7])
             Reg[Rz] = int(Reg[Rx]) - int(Reg[Ry])
             PC += 1
-            
+
         if (debug_mode):
             if ((DIC % Nsteps) == 0):  # print stats every Nsteps
                 print("Registers R0-R3: ", Reg)
@@ -446,7 +446,7 @@ def main():
                 file1 = "p3_group_8_p1_imem.txt"
                 askProgram = False
             elif(program == '2'):
-                file1 = "i_mem2.txt"
+                file1 = "p3_group_8_p2_imem.txt"
                 askProgram = False
             else:
                 print("\nError. Unrecognized program. Try again")
