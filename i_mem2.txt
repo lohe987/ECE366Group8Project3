@@ -23,12 +23,12 @@ init $r0, 2	#r0 = 2 NEXT LOCATION!!!!!!!!
 lw $r1, $r0	#r1 = address in 0x2
 lw $r2, $r1	#r2 = value in address from array, start@0x107		
 init $r0, 3	#r0 = 3
-lw r0, r0	#r0 = T
+lw $r0, $r0	#r0 = T
 xor $r0, $r2	#r2 = value in array XOR T to determine bms 
 init $r1, 1	#r1 = 1 SHIFT LOCATION!!!!!!!!
 and $r1, $r2	#r1 = 1 AND with value from xor to see matching  		 
 init $r0, 1	#r0 = 1
-lw r3, r0	#r3 = value in 0x1
+lw $r3, $r0	#r3 = value in 0x1
 add $r1, $r3	#r3 = r1 + r3
 sw $r3, $r0	#0x1 = r3 storing number of bits that don’t match
 srl $r2		#r2 shifted right
@@ -155,8 +155,8 @@ sub $r0, $r1, $r1
 init $r0, 4	#r0 = 4 
 lw $r0, $r0	#r0 = value in 0x4
 sw $r0, $r1	#r1 address = r0
-init $r1, 2
-sw $r0, $r1
+init $r0, 2
+sw $r1, $r0	
 init $r1, 5 	#r1 = 5
 add $r1, $r1    #r1 = 10 
 add $r1, $r1    #r1 = 20
