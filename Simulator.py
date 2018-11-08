@@ -5,7 +5,7 @@
 #                         output the state of each reg, and PC
 #            Normal mode: Execute program all at once
 
-def disassemble(I, Nlines, assembly):
+def disassemble(I, Nlines):
     print("ECE366 Fall 2018 \nFJsquared: Disassembler")
     print("-----------------")
     # print(I)
@@ -138,30 +138,24 @@ def disassemble(I, Nlines, assembly):
             print(disassembled[0] + disassembled[1] + disassembled[2] + disassembled[3])
 
 
-def assemble(I, Nlines, assembly, iFile):
+def assemble(I, Nlines):
     print("ECE366 Fall 2018 FJsquared: Assembler")
     print("")
-    #If the instructions are in assembly, we clear the instruction file to write machine code
-    #if (!(I[1].isdigit())):
-    iFile.truncate(0)
+
     for i in range(Nlines):
         line = I[i]
         print()
         print(line)
-        splitLine = line.split("#")
-        if (len(splitLine) == 2):
-            line = splitLine[0].replace(" ", "")  # remove comments
-        else:
-            line = splitLine[0].replace(" ", "")
-
-        # if it is not machine code, put the assembly in the the assembly instructions
-        #f (!(line.isdigit())):
-        #    assembly.append(line + "\n")
         line = line.replace("$", "")
         line = line.replace("r", "")
         line = line.replace("\n", "")
         line = line.replace("\t", "")
 
+        splitLine = line.split("#")
+        if (len(splitLine) == 2):
+            line = splitLine[0].replace(" ", "")  # remove comments
+        else:
+            line = splitLine[0].replace(" ", "")
 
         if (line[0:4] == "init"):
             line = line.replace("init", "")
@@ -169,13 +163,13 @@ def assemble(I, Nlines, assembly, iFile):
             R = format(int(line[0]), "02b")
             imm = str(format(int(line[1]), "04b"))
             op = "10"
-            toPrint = "1 " + op + " " + imm[0:3] + " " + R + " " + imm[2:4]
+            print("P " + op + " " + imm[0:3] + " " + R + " " + imm[2:4])
 
         elif (line[0:3] == "bez"):
             line = line.replace("bez", "")
             R = format(int(line), "01b")
             op = "11"
-            toPrint = "1 " + op + " XX " + R + " XX "
+            print("P " + op + " XX " + R + " XX ")
 
         elif (line[0:3] == "add"):
             line = line.replace("add", "")
@@ -183,7 +177,7 @@ def assemble(I, Nlines, assembly, iFile):
             Rx = format(int(line[0]), "01b")
             Ry = format(int(line[1]), "02b")
             op = "0000"
-            toPrint = "1 " + op + " " + Rx + " " + Ry
+            print("P " + op + " " + Rx + " " + Ry)
 
         elif (line[0:3] == "slt"):
             line = line.replace("slt", "")
@@ -191,7 +185,7 @@ def assemble(I, Nlines, assembly, iFile):
             Ry = format(int(line[0]), "01b")
             Rx = format(int(line[1]), "02b")
             op = "0001"
-            toPrint = "1 " + op + " " + Rx + " " + Ry
+            print("P " + op + " " + Rx + " " + Ry)
 
         elif (line[0:2] == "lw"):
             line = line.replace("lw", "")
@@ -199,7 +193,7 @@ def assemble(I, Nlines, assembly, iFile):
             Ry = format(int(line[0]), "02b")
             Rx = format(int(line[1]), "01b")
             op = "0011"
-            toPrint = "1 " + op + " " + Rx + " " + Ry
+            print("P " + op + " " + Rx + " " + Ry)
 
         elif (line[0:2] == "sw"):
             line = line.replace("sw", "")
@@ -207,7 +201,7 @@ def assemble(I, Nlines, assembly, iFile):
             Ry = format(int(line[0]), "02b")
             Rx = format(int(line[1]), "01b")
             op = "0010"
-            toPrint = "1 " + op + " " + Rx + " " + Ry
+            print("P " + op + " " + Rx + " " + Ry)
 
         elif (line[0:3] == "XOR"):
             line = line.replace("XOR", "")
@@ -215,7 +209,7 @@ def assemble(I, Nlines, assembly, iFile):
             Rx = format(int(line[0]), "01b")
             Ry = format(int(line[1]), "02b")
             op = "0100"
-            toPrint = "1 " + op + " " + Rx + " " + Ry
+            print("P " + op + " " + Rx + " " + Ry)
 
         elif (line[0:3] == "AND"):  # why "slt0" instead of "sltR0" ?
             line = line.replace("AND", "")
@@ -223,15 +217,15 @@ def assemble(I, Nlines, assembly, iFile):
             Rx = format(int(line[0]), "01b")
             Ry = format(int(line[1]), "02b")
             op = "0101"
-            toPrint = "1 " + op + " " + Rx + " " + Ry
+            print("P " + op + " " + Rx + " " + Ry)
 
-        elif (line[0:3] == "srl"):
-            line = line.replace("srl", "")
+        elif (line[0:2] == "sl"):
+            line = line.replace("sl", "")
             line = line.split(",")
             Rx = format(int(line[0]), "02b")
 
             op = "0111"
-            toPrint = "1 " + op + " X " + Rx
+            print("P " + op + " X " + Rx)
 
         elif (line[0:3] == "sub"):
             line = line.replace("sub", "")
@@ -241,16 +235,10 @@ def assemble(I, Nlines, assembly, iFile):
             Rz = str(int(line[2]))
 
             op = "0110"
-            toPrint = "1 " + op + " " + Rx + " " + Ry + " " + Rz
+            print("P " + op + " " + Rx + " " + Ry + " " + Rz)
 
         else:
-            toPrint = "PLEASE FIX"
-        print(toPrint)
-        #if it is not machine code, replace instruction file with the machine code
-        #if (!(line.isdigit())):
-        #    iFile.append(toPrint)
-
-
+            print("PLEASE FIX")
 
 
 def simulate(I, Nsteps, debug_mode, Memory):
@@ -309,23 +297,22 @@ def simulate(I, Nsteps, debug_mode, Memory):
             fetch = fetch.split(",")
             Rx = int(fetch[0])
             Ry = int(fetch[1])
-            compVal = Reg[Ry] - Reg[Rx]
-            if (compVal > 0):
+
+
+            if (Reg[Rx] < Reg[Ry]):
                 Reg[Rx] = 1
 
             else:
                 Reg[Rx] = 0
+
             PC += 1
-            
         elif (fetch[0:2] == "xo"):  # DONE
             fetch = fetch.replace("xo", "")
             fetch = fetch.split(",")
-            print(fetch)
             Rx = int(fetch[0])
             Ry = int(fetch[1])
-            Reg[Rx] = Reg[Rx] ^ Reg[Ry]
+            Reg[Ry] = Reg[Rx] ^ Reg[Ry]
             PC += 1
-            
         elif (fetch[0:2] == "lw"):  # DONE
             fetch = fetch.replace("lw", "")
             fetch = fetch.split(",")
@@ -345,10 +332,10 @@ def simulate(I, Nsteps, debug_mode, Memory):
             fetch = fetch.split(",")
             Rx = int(fetch[0])
             Ry = int(fetch[1])
-            Reg[Rx] = Reg[Rx] and Reg[Ry]
+            Reg[Rx] = Reg[Rx] & Reg[Ry]
             PC += 1
-        elif (fetch[0:3] == "srl"): # DONE
-            fetch = fetch.replace("srl", "")
+        elif (fetch[0:2] == "sl"): # DONE
+            fetch = fetch.replace("sl", "")
             Rx = int(fetch)
             Reg[Rx] = Reg[Rx] >> 1
             PC += 1
@@ -387,7 +374,7 @@ def simulate(I, Nsteps, debug_mode, Memory):
     
 
 def main():
-    instr_file = open("i_mem.txt", "r")
+    instr_file = open("i_mem2.txt", "r")
     data_file = open("d_mem.txt", "r")
     Memory = []
     debug_mode = False  # is machine in debug mode?
