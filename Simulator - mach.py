@@ -115,7 +115,16 @@ def disassemble(I, Nlines):     # Check imm
             rz = "$r" + str(line[7])
             print(op + rx + ry + rz)
     print("******** COMPLETE OPERATION *********")
-
+    while(True):
+        print("\nDo you want to go back to the menu? (Y/N)\n\n")
+        prompt = input(">>")
+        if(prompt == 'y'):
+            return True
+        elif(prompt == 'n'):
+            print("\nGoodbye!\n")
+            return False
+        else:
+            print("Unknown selection. Please pick Y or N.\n")
 
 def assemble(I, Nlines):    # Check imm
     print("ECE366 Fall 2018 FJsquared: Assembler")
@@ -170,28 +179,31 @@ def assemble(I, Nlines):    # Check imm
             Ry = format(int(line[1]), "02b")
             op = "0001"
             lineEdit = (op + Rx + Ry)
+            #print("SLT")
             findParity(lineEdit)
 
         elif (line[0:2] == "lw"):   # DONE
             line = line.replace("lw", "")
             line = line.split(",")
-            Ry = format(int(line[1]), "02b")
-            Rx = format(int(line[0]), "01b")
+            Ry = format(int(line[0]), "02b")
+            Rx = format(int(line[1]), "01b")
             op = "0011"
             lineEdit = (op + Rx + Ry)
+            #print("lw:Ry:" + line[1] + "Rx:" + line[0] + "Rx:" + Rx + " Ry:" + Ry)
             findParity(lineEdit)
 
         elif (line[0:2] == "sw"):   # DONE
             line = line.replace("sw", "")
             line = line.split(",")
-            Ry = format(int(line[1]), "02b")
-            Rx = format(int(line[0]), "01b")
+            Ry = format(int(line[0]), "02b")
+            Rx = format(int(line[1]), "01b")
             op = "0010"
             lineEdit = (op + Rx + Ry)
+            #print("sw:Ry:" + line[1] + "Rx:" + line[0] + "Rx:" + Rx + " Ry:" + Ry)
             findParity(lineEdit)
 
-        elif (line[0:3] == "xor"):  # DONE 
-            line = line.replace("xor", "")
+        elif (line[0:2] == "xo"):  # DONE
+            line = line.replace("xo", "")
             line = line.split(",")
             Rx = format(int(line[0]), "01b")
             Ry = format(int(line[1]), "02b")
@@ -208,8 +220,8 @@ def assemble(I, Nlines):    # Check imm
             lineEdit = (op + Rx + Ry)
             findParity(lineEdit)
 
-        elif (line[0:3] == "srl"):
-            line = line.replace("srl", "")
+        elif (line[0:2] == "sl"):
+            line = line.replace("sl", "")
             Rx = format(int(line[0]), "02b")
             op = "0111"
             lineEdit = (op + "0" + Rx)  # The zero is a don't care
@@ -226,9 +238,19 @@ def assemble(I, Nlines):    # Check imm
             findParity(lineEdit)
 
         else:
-            print("INSTRUCTION DOES NOT EXIST, SKIPED")
+            print("INSTRUCTION DOES NOT EXIST, SKIPPED")
+            print("Fetched: " + line)
     print("******** COMPLETE OPERATION *********")
-
+    while(True):
+        print("\nDo you want to go back to the menu? (Y/N)\n\n")
+        prompt = input(">>")
+        if(prompt == 'y'):
+            return True
+        elif(prompt == 'n'):
+            print("\nGoodbye!\n")
+            return False
+        else:
+            print("Unknown selection. Please pick Y or N.\n")
 
 
 def simulate(I, Nsteps, debug_mode, Memory):
@@ -360,11 +382,11 @@ def simulate(I, Nsteps, debug_mode, Memory):
             data.write("\n")
         data.close()
     while(True):
-        print("\nDo you want to go back to the menu? (Y/N)")
+        print("\nDo you want to go back to the menu? (Y/N)\n\n")
         prompt = input(">>")
-        if(prompt == 'y'):
+        if(prompt == 'y' or prompt == 'Y'):
             return True
-        elif(prompt == 'n'):
+        elif(prompt == 'n' or prompt == 'N'):
             print("\nGoodbye!\n")
             return False
         else:
@@ -379,40 +401,44 @@ def main():
     Instruction = []  # all instructions will be stored here
     askAgain = True
     while(askAgain):
-        print("\nWelcome to FJsquared's ISA Menu")
-        print(" 1 = simulator")
-        print(" 2 = disassembler")
-        print(" 3 = assembler")
-        mode = int(input("Please enter the mode of program: "))
-        print("\nMode selected: ", end="")
-        if (mode == 1):
-            print("Simulator")
-            print("\nSimulator has 2 modes: ")
-            print(" 1] Normal execution")
-            print(" 2] Debug mode")
-            simMode = int(input("Please select simulator's mode: "))
-            if (simMode == 1):
-                debug_mode = False
-            elif (simMode == 2):
-                debug_mode = True
-                Nsteps = int(input("Debug Mode selected. Please enter # of debugging steps: "))
+        while(askAgain):
+            print("\nWelcome to FJsquared's ISA Menu")
+            print(" 1 = simulator")
+            print(" 2 = disassembler")
+            print(" 3 = assembler")
+            mode = int(input("Please enter the mode of program: "))
+            print("\nMode selected: ", end="")
+            if (mode == 1):
+                print("Simulator")
+                print("\nSimulator has 2 modes: ")
+                print(" 1] Normal execution")
+                print(" 2] Debug mode")
+                simMode = int(input("Please select simulator's mode: "))
+                if (simMode == 1):
+                    debug_mode = False
+                    askAgain =False
+                elif (simMode == 2):
+                    debug_mode = True
+                    askAgain = False
+                    Nsteps = int(input("Debug Mode selected. Please enter # of debugging steps: "))
+                else:
+                    print("Error, unrecognized input. Try again.\n")
+                    askAgain = True
+                    mode = 4
+            elif (mode == 2):
+                print("Disassembler")
+                askAgain = False
+            elif (mode == 3):
+                print("Assembler")
+                askAgain = False
             else:
-                print("Error, unrecognized input. Try again.\n")
+                print("\nError. Unrecognized mode. Try Again\n")
                 askAgain = True
-                mode = 4
-        elif (mode == 2):
-            print("Disassembler")
-        elif (mode == 3):
-            print("Assembler")
-        else:
-            print("\nError. Unrecognized mode. Try Again\n")
-            askAgain = True
         # mode = 1            # 1 = Simulation
         # 2 = disassembler
         # 3 = assembler
         # Which files are we looking at?
         askProgram = True
-        program = 0
         while(askProgram):
             print("\nPlease input which program we are using: (1 or 2)")
             program = input(">>")
@@ -420,17 +446,17 @@ def main():
                 file1 = "p3_group_8_p1_imem.txt"
                 askProgram = False
             elif(program == '2'):
-                file1 = "p3_group_8_p2_imem.txt"
+                file1 = "i_mem2.txt"
                 askProgram = False
             else:
                 print("\nError. Unrecognized program. Try again")
-        program = 'A'
         askProgram = True
         while (askProgram):
             print("\nPlease input which data memory we are using: (A or B or C or D)")
-            program == input(">>")
-            if (program == 'A'):
+            program = input(">>")
+            if (program == "A"):
                 file2 = "p3_group_8_dmem_A.txt"
+                print("ERROR " + program)
                 askProgram = False
             elif (program == 'B'):
                 file2 = "p3_group_8_dmem_B.txt"
