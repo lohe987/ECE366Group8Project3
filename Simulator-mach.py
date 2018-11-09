@@ -17,6 +17,7 @@ def findParity(line):
     else:
         line = str("1" + line)
     print(line) # Print the result of the given instruction
+    #return line + "\n""
                 
 def fromMem(line):
     if(line >= 32768):
@@ -30,11 +31,12 @@ def toMem(regVal):
     else:
         return regVal
 
-def disassemble(I, Nlines):     # Check imm
+def disassemble(I, Nlines, sim):     # Check imm
     print("ECE366 Fall 2018 \nFJsquared: Disassembler")
     print("-----------------")
     # print(I)
 
+    newInstr = []
     for i in range(Nlines):
         line = I[i]
         #print(line) # comment out when done
@@ -50,62 +52,62 @@ def disassemble(I, Nlines):     # Check imm
                 imm = "-" + str(imm)
             else:
                 imm = str(imm)
-            print(op + R + imm)
+            toPrint = op + R + imm + "\n"
 
         elif (line[1:3] == '11'):   # DONE # bez: 11
             # Disassembling it to: bez imm
             op = "bez "
             R = "$r" + line[5]
-            print(op + R)
+            toPrint = (op + R) + "\n"
 
         elif (line[1:5] == '0000'):  # DONE # add: 0000
             # Disassembling it to: add rx, ry
             op = "add "
             rx = "$r" + line[5] + ", "
             ry = "$r" + str(format(int(line[6] + line[7], 2)))
-            print(op + rx + ry)
+            toPrint = (op + rx + ry) + "\n"
 
         elif (line[1:5] == '0001'):  # DONE # slt: 0001
             # Disassembling it to: slt rx, ry
             op = "slt "
             rx = "$r" + line[5] + ", "
             ry = "$r" + str(format(int(line[6] + line[7], 2)))
-            print(op + rx + ry)
+            toPrint = op + rx + ry + "\n"
 
         elif (line[1:5] == '0011'):  # DONE # lw: 0011
             # Disassembling it to: lw imm (unsigned)
             op = "lw "
             rx = "$r" + line[5] + ", "
             ry = "$r" + str(format(int(line[6] + line[7], 2)))
-            print(op + rx + ry)
+            toPrint = (op + rx + ry) + "\n"
 
         elif(line[1:5] == '0010'):  # DONE # sw: 0010
             # Disassembling it to: sw imm (unsigned)
             op = "sw "
             rx = "$r" + line[5] + ", "
             ry = "$r" + str(format(int(line[6] + line[7], 2)))
-            print(op + rx + ry)
+            toPrint = (op + rx + ry) + "\n"
 
         elif (line[1:5] == '0100'):  # DONE # xor: 0100
             # Disassembling it to: xor rx, ry
             op = "xor "
             rx = "$r" + line[5] + ", "
             ry = "$r" + str(format(int(line[6] + line[7], 2)))
-            print(op + rx + ry)
+            toPrint = (op + rx + ry) + "\n"
 
         elif (line[1:5] == '0101'):  # DONE # and: 0101
             # Disassembling it to: and rx, ry
             op = "and "
             rx = "$r" + line[5] + ", "
             ry = "$r" + str(format(int(line[6] + line[7], 2)))
-            print(op + rx + ry)
+            toPrint = (op + rx + ry) + "\n"
 
         elif (line[1:5] == '0111'):  # DONE # srl: 0111
             # Disassembling it to: srl rx
             op = "srl "
             rx = "$r" + line[5] + ", "
             ry = "$r" + str(format(int(line[6] + line[7], 2)))
-            print(op + rx + ry)
+            toPrint = (op + rx + ry) + "\n"
 
         elif (line[1:5] == '0110'):  # DONE # sub: 0110
             # Disassembling it to: sub rx, ry, rz
@@ -113,8 +115,12 @@ def disassemble(I, Nlines):     # Check imm
             rx = "$r" + str(line[5]) + ", "
             ry = "$r" + str(line[6]) + ", "
             rz = "$r" + str(line[7])
-            print(op + rx + ry + rz)
+            toPrint = (op + rx + ry + rz) +"\n"
+        print(toPrint)
+        newInstr.append(toPrint)
     print("******** COMPLETE OPERATION *********")
+    if(sim):
+        return newInstr
     while(True):
         print("\nDo you want to go back to the menu? (Y/N)\n\n")
         prompt = input(">>")
@@ -154,7 +160,7 @@ def assemble(I, Nlines):    # Check imm
             imm = str(format(int(line[1]), "04b"))
             op = "10"
             lineEdit = str(op + imm[0:2] + R + imm[2:4])
-            findParity(lineEdit)
+            newInstr.append(findParity(lineEdit))
 
         elif (line[0:3] == "bez"):  # DONE
             line = line.replace("bez", "")
@@ -265,94 +271,114 @@ def simulate(I, Nsteps, debug_mode, Memory):
         fetch = I[PC]
         DIC += 1
 
-        #if (debug_mode):
-        #    print("\n***!!!!! NEXT INSTRUCTION !!!!!***")
-         #   print(fetch)
+        if (debug_mode):
+            print("\n***NEXT INSTRUCTION***")
+            print(fetch)
+        fetch = fetch.replace("$", "")  # Delete all the '$' to make things simpler
+        fetch = fetch.replace("r", "")  # Delete all the 'r' to make things simpler
+        fetch = fetch.replace(" ", "")  # Delete all the ' ' to make things simpler
+        fetch = fetch.replace("\t", "")  # Delete all the '\t' to make things simpler
 
-        if (fetch[1:3] == "10"): # DONE # init: 10
-            R = int(fetch[5])
-            imm = fetch[3] + fetch[4] + fetch[6] + fetch[7]
-            imm = int(format(int(imm,2)))
+        splitLine = fetch.split("#")
+        if (len(splitLine) == 2):
+            fetch = splitLine[0].replace(" ", "")  # remove comments
+        else:
+            fetch = splitLine[0].replace(" ", "")
 
-            if (fetch[3] == '1'):
-                imm = -16 + imm
-            Reg[R] = int(imm)
+        if (fetch[0:4] == "init"):  # DONE
+
+            # Extracting data values
+            fetch = fetch.replace("init", "")
+            fetch = fetch.split(",")
+            R = int(fetch[0])
+            imm = int(fetch[1])
+            Reg[R] = imm
             PC += 1
-
-        elif (fetch[1:3] == '11'):   # DONE # bez: 11
-            R = int(fetch[5])
+        elif (fetch[0:3] == "bez"):  # DONE
+            fetch = fetch.replace("bez", "")
+            R = int(fetch)
             if (Reg[0] == 0):
                 PC = PC + Reg[R]
-                if (Reg[R] == 0):   # Dead loop
+                if (Reg[R] == 0):
                     finished = True
             else:
                 PC += 1
-
-        elif (fetch[1:5] == '0000'):  # DONE # add: 0000
-            Rx = int(fetch[5])
-            Ry = int(fetch[6] + fetch[7], 2)
+        elif (fetch[0:3] == "add"):  # DONE
+            fetch = fetch.replace("add", "")
+            fetch = fetch.split(",")
+            Rx = int(fetch[0])
+            Ry = int(fetch[1])
             Reg[Ry] = Reg[Rx] + Reg[Ry]
             PC += 1
+        elif (fetch[0:3] == "slt"):  # DONE
+            fetch = fetch.replace("slt", "")
+            fetch = fetch.split(",")
+            Rx = int(fetch[0])
+            Ry = int(fetch[1])
 
-        elif (fetch[1:5] == '0001'):  # DONE # slt: 0001
-            Rx = int(fetch[5])
-            Ry = int(fetch[6] + fetch[7], 2)
+
             if (Reg[Rx] < Reg[Ry]):
                 Reg[Rx] = 1
+
             else:
                 Reg[Rx] = 0
-            PC += 1
 
-        elif (fetch[1:5] == '0100'):  # DONE # xor: 0100
-            Rx = int(fetch[5])
-            Ry = int(fetch[6] + fetch[7], 2)
-            Reg[Rx] = Reg[Rx] ^ Reg[Ry]
             PC += 1
-
-        elif (fetch[1:5] == '0011'):  # DONE # lw: 0011
-            Rx = int(fetch[5])
-            Ry = int(fetch[6] + fetch[7], 2)
+        elif (fetch[0:2] == "xo"):  # DONE
+            fetch = fetch.replace("xo", "")
+            fetch = fetch.split(",")
+            Rx = int(fetch[0])
+            Ry = int(fetch[1])
+            Reg[Ry] = Reg[Rx] ^ Reg[Ry]
+            PC += 1
+        elif (fetch[0:2] == "lw"):  # DONE
+            fetch = fetch.replace("lw", "")
+            fetch = fetch.split(",")
+            Ry = int(fetch[0])
+            Rx = int(fetch[1])
             Reg[Ry] = Memory[Reg[Rx]]
             PC += 1
-
-        elif(fetch[1:5] == '0010'):  # DONE # sw: 0010
-            Rx = int(fetch[5])
-            Ry = int(fetch[6] + fetch[7], 2)
-            print(Reg[Ry])
-            Memory[Reg[Ry]] = Reg[Rx]
+        elif (fetch[0:2] == "sw"):  # DONE
+            fetch = fetch.replace("sw", "")
+            fetch = fetch.split(",")
+            Ry = int(fetch[0])
+            Rx = int(fetch[1])
+            Memory[Reg[Rx]] = Reg[Ry]
             PC += 1
-
-        elif (fetch[1:5] == '0101'):  # DONE # and: 0101
-            Rx = int(fetch[5])
-            Ry = int(fetch[6] + fetch[7], 2)
+        elif (fetch[0:3] == "and"):  # DONE
+            fetch = fetch.replace("and", "")
+            fetch = fetch.split(",")
+            Rx = int(fetch[0])
+            Ry = int(fetch[1])
             Reg[Rx] = Reg[Rx] & Reg[Ry]
             PC += 1
-
-        elif (fetch[1:5] == '0111'):  # DONE # srl: 0111
-            Rx = int(fetch[6] + fetch[7], 2)
+        elif (fetch[0:2] == "sl"): # DONE
+            fetch = fetch.replace("sl", "")
+            Rx = int( fetch, 2)
             Reg[Rx] = Reg[Rx] >> 1
             PC += 1
-
-        elif (fetch[1:5] == '0110'):  # DONE # sub: 0110
-            Rx = int(fetch[5])
-            Ry = int(fetch[6])
-            Rz = int(fetch[7])
-            Reg[Rz] = int(Reg[Rx]) - int(Reg[Ry])
+        elif (fetch[0:3] == "sub"): # DONE
+            fetch = fetch.replace("sub", "")
+            fetch = fetch.split(",")
+            Rx = int(fetch[0])
+            Ry = int(fetch[1])
+            Rz = int(fetch[2])
+            Reg[Rz] = Reg[Rx] - Reg[Ry]
             PC += 1
-
         if (debug_mode):
             if ((DIC % Nsteps) == 0):  # print stats every Nsteps
                 print("Registers R0-R3: ", Reg)
                 print("Program Counter : ", PC)
                 # print("Memory: ",Memory)   # Dont print memory atm.
                 # Too much cluster
-                input("Press any enter to continue")
+                input("Press any key to continue")
                 print()
         elif (finished) :
             print("Program success")
         else:
             continue
-        if(not debug_mode):
+
+    if(not debug_mode):
             print("******** Simulation finished *********")
             print("Dynamic Instr Count: ", DIC)
             print("Registers R0-R3: ", Reg)
@@ -363,23 +389,23 @@ def simulate(I, Nsteps, debug_mode, Memory):
                     print(", ", end='')
             print("]")
             print("PC: ", PC)
-        else:
-            if ((DIC % Nsteps) == 0):  # print stats every Nsteps
-                print("******** Simulation finished *********")
-                print("Dynamic Instr Count: ", DIC)
-                print("Registers R0-R3: ", Reg)
-                print("Memory :[", end='')
-                for i in range(len(Memory)):
-                    print(Memory[i], end='')
-                    if (i != len(Memory) - 1):
-                        print(", ", end='')
-                print("]")
-                print("PC: ", PC)
-        data = open("d_mem.txt", "w")  # Write data back into d_mem.txt
-        for i in range(len(Memory)):
-            data.write(format(Memory[i], "016b"))
-            data.write("\n")
-        data.close()
+    else:
+        if ((DIC % Nsteps) == 0):  # print stats every Nsteps
+            print("******** Simulation finished *********")
+            print("Dynamic Instr Count: ", DIC)
+            print("Registers R0-R3: ", Reg)
+            print("Memory :[", end='')
+            for i in range(len(Memory)):
+                print(Memory[i], end='')
+                if (i != len(Memory) - 1):
+                    print(", ", end='')
+            print("]")
+            print("PC: ", PC)
+    data = open("d_mem.txt", "w")  # Write data back into d_mem.txt
+    for i in range(len(Memory)):
+        data.write(format(Memory[i], "016b"))
+        data.write("\n")
+    data.close()
     while(True):
         print("\nDo you want to go back to the menu? (Y/N)\n\n")
         prompt = input(">>")
@@ -400,6 +426,7 @@ def main():
     Instruction = []  # all instructions will be stored here
     askAgain = True
     while(askAgain):
+        doBoth = False
         while(askAgain):
             print("\nWelcome to FJsquared's ISA Menu")
             print(" 1 = simulator")
@@ -439,13 +466,17 @@ def main():
         # Which files are we looking at?
         askProgram = True
         while(askProgram):
-            print("\nPlease input which program we are using: (1 or 2)")
+            print("\nPlease input which program we are using:\n1 = Program 1\n2 = Program 2\n3 = Both Prgorams")
             program = input(">>")
             if(program == '1'):
                 file1 = "p3_group_8_p1_imem.txt"
                 askProgram = False
             elif(program == '2'):
-                file1 = "p3_group_8_p2_imem.txt"
+                file1 = "i_mem2.txt"
+                askProgram = False
+            elif(program == '3'):
+                file1 = "i_mem2.txt"
+                doBoth = True
                 askProgram = False
             else:
                 print("\nError. Unrecognized program. Try again")
@@ -455,10 +486,10 @@ def main():
             program = input(">>")
             if (program == "A"):
                 file2 = "p3_group_8_dmem_A.txt"
-                print("ERROR " + program)
+                #print("ERROR " + program)
                 askProgram = False
             elif (program == 'B'):
-                file2 = "d_mem.txt"
+                file2 = "p3_group_8_dmem_B.txt"
                 askProgram = False
             elif (program == 'C'):
                 file2 = "p3_group_8_dmem_C.txt"
@@ -485,9 +516,15 @@ def main():
             Memory.append(int(line, 2))
 
         if (mode == 1):  # Check wether to use disasembler or assembler or simulation
-            askAgain = simulate(Instruction, Nsteps, debug_mode, Memory)
+            Instruction1 = disassemble(Instruction, Nlines, True)
+            askAgain = simulate(Instruction1, Nsteps, debug_mode, Memory)
+            if(doBoth == True):
+                instr_file.close()
+                instr_file = open("p3_group_8_p1_imem.txt", "r")
+                Instruction1 = assemble(Instruction, Nlines)
+                askAgain = simulate(Instruction1, Nsteps, debug_mode, Memory)
         elif (mode == 2):
-            askAgain = disassemble(Instruction, Nlines)
+            askAgain = disassemble(Instruction, Nlines, False)
         elif (mode == 3):
             askAgain = assemble(Instruction, Nlines)
 
