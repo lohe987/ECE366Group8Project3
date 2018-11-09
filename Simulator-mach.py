@@ -105,9 +105,8 @@ def disassemble(I, Nlines, sim):     # Check imm
         elif (line[1:5] == '0111'):  # DONE # srl: 0111
             # Disassembling it to: srl rx
             op = "srl "
-            rx = "$r" + line[5] + ", "
             ry = "$r" + str(format(int(line[6] + line[7], 2)))
-            toPrint = (op + rx + ry) + "\n"
+            toPrint = (op + ry) + "\n"
 
         elif (line[1:5] == '0110'):  # DONE # sub: 0110
             # Disassembling it to: sub rx, ry, rz
@@ -116,8 +115,10 @@ def disassemble(I, Nlines, sim):     # Check imm
             ry = "$r" + str(line[6]) + ", "
             rz = "$r" + str(line[7])
             toPrint = (op + rx + ry + rz) +"\n"
-        print(toPrint)
-        newInstr.append(toPrint)
+        if(not sim):
+            print(toPrint)
+        else:
+            newInstr.append(toPrint)
     print("******** COMPLETE OPERATION *********")
     if(sim):
         return newInstr
@@ -279,6 +280,8 @@ def simulate(I, Nsteps, debug_mode, Memory):
         fetch = fetch.replace(" ", "")  # Delete all the ' ' to make things simpler
         fetch = fetch.replace("\t", "")  # Delete all the '\t' to make things simpler
 
+        fetch = fetch.replace("\n", "")  # Delete all the '\t' to make things simpler
+
         splitLine = fetch.split("#")
         if (len(splitLine) == 2):
             fetch = splitLine[0].replace(" ", "")  # remove comments
@@ -354,7 +357,7 @@ def simulate(I, Nsteps, debug_mode, Memory):
             PC += 1
         elif (fetch[0:2] == "sl"): # DONE
             fetch = fetch.replace("sl", "")
-            Rx = int( fetch, 2)
+            Rx = int(fetch)
             Reg[Rx] = Reg[Rx] >> 1
             PC += 1
         elif (fetch[0:3] == "sub"): # DONE
