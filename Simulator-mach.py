@@ -77,16 +77,16 @@ def disassemble(I, Nlines, sim):     # Check imm
         elif (line[1:5] == '0011'):  # DONE # lw: 0011
             # Disassembling it to: lw imm (unsigned)
             op = "lw "
-            rx = "$r" + line[5] + ", "
-            ry = "$r" + str(format(int(line[6] + line[7], 2)))
-            toPrint = (op + rx + ry) + "\n"
+            ry = "$r" + str(format(int(line[6] + line[7], 2))) + ", "
+            rx = "$r" + line[5]
+            toPrint = (op + ry + rx) + "\n"
 
         elif(line[1:5] == '0010'):  # DONE # sw: 0010
             # Disassembling it to: sw imm (unsigned)
             op = "sw "
-            rx = "$r" + line[5] + ", "
-            ry = "$r" + str(format(int(line[6] + line[7], 2)))
-            toPrint = (op + rx + ry) + "\n"
+            ry = "$r" + str(format(int(line[6] + line[7], 2))) + ", "
+            rx = "$r" + line[5]
+            toPrint = (op + ry + rx) + "\n"
 
         elif (line[1:5] == '0100'):  # DONE # xor: 0100
             # Disassembling it to: xor rx, ry
@@ -161,7 +161,7 @@ def assemble(I, Nlines):    # Check imm
             imm = str(format(int(line[1]), "04b"))
             op = "10"
             lineEdit = str(op + imm[0:2] + R + imm[2:4])
-            newInstr.append(findParity(lineEdit))
+            findParity(lineEdit)
 
         elif (line[0:3] == "bez"):  # DONE
             line = line.replace("bez", "")
@@ -263,6 +263,9 @@ def assemble(I, Nlines):    # Check imm
 def simulate(I, Nsteps, debug_mode, Memory):
     print("ECE366 Fall 2018 ISA Design: Simulator")
     print()
+    newMemory = []
+    for i in Memory:
+        newMemory.append(i)
     PC = 0  # Program-counter
     DIC = 0
     Reg = [0, 0, 0, 0]  # 4 registers, init to all 0
@@ -339,14 +342,14 @@ def simulate(I, Nsteps, debug_mode, Memory):
             fetch = fetch.split(",")
             Ry = int(fetch[0])
             Rx = int(fetch[1])
-            Reg[Ry] = Memory[Reg[Rx]]
+            Reg[Ry] = newMemory[Reg[Rx]]
             PC += 1
         elif (fetch[0:2] == "sw"):  # DONE
             fetch = fetch.replace("sw", "")
             fetch = fetch.split(",")
             Ry = int(fetch[0])
             Rx = int(fetch[1])
-            Memory[Reg[Rx]] = Reg[Ry]
+            newMemory[Reg[Rx]] = Reg[Ry]
             PC += 1
         elif (fetch[0:3] == "and"):  # DONE
             fetch = fetch.replace("and", "")
@@ -386,27 +389,31 @@ def simulate(I, Nsteps, debug_mode, Memory):
             print("Dynamic Instr Count: ", DIC)
             print("Registers R0-R3: ", Reg)
             print("Memory :[", end = '')
-            for i in range(len(Memory)):
-                print(Memory[i], end='')
-                if(i != len(Memory) - 1):
+            for i in range(len(newMemory)):
+                print(newMemory[i], end='')
+                if(i != len(newMemory) - 1):
                     print(", ", end='')
             print("]")
             print("PC: ", PC)
+        
     else:
         if ((DIC % Nsteps) == 0):  # print stats every Nsteps
             print("******** Simulation finished *********")
             print("Dynamic Instr Count: ", DIC)
             print("Registers R0-R3: ", Reg)
             print("Memory :[", end='')
-            for i in range(len(Memory)):
-                print(Memory[i], end='')
-                if (i != len(Memory) - 1):
+            for i in range(len(newMemory)):
+                print(newMemory[i], end='')
+                if (i != len(newMemory) - 1):
                     print(", ", end='')
             print("]")
             print("PC: ", PC)
+
+    Memory[4] = newMemory[4]
+    Memory[5] = newMemory[5]        
     data = open("d_mem.txt", "w")  # Write data back into d_mem.txt
-    for i in range(len(Memory)):
-        data.write(format(Memory[i], "016b"))
+    for i in range(len(newMemory)):
+        data.write(format(newMemory[i], "016b"))
         data.write("\n")
     data.close()
     while(True):
@@ -425,8 +432,10 @@ def main():
     Memory = []
     debug_mode = False  # is machine in debug mode?
     Nsteps = 3  # How many cycle to run before output statistics
-    Nlines = 0  # How many instrs total in input.txt
-    Instruction = []  # all instructions will be stored here
+    Nlines1 = 0  # How many instrs total in input.txt
+    Nlines2 = 0
+    Instruction1 = []  # all instructions in P1 will be stored here
+    Instruction2 = []  # all instructions in P2 will be stored here
     askAgain = True
     while(askAgain):
         doBoth = False
@@ -475,10 +484,10 @@ def main():
                 file1 = "p3_group_8_p1_imem.txt"
                 askProgram = False
             elif(program == '2'):
-                file1 = "i_mem2.txt"
+                file1 = "p3_group_8_p2_imem.txt"
                 askProgram = False
             elif(program == '3'):
-                file1 = "i_mem2.txt"
+                file1 = "p3_group_8_p2_imem.txt"
                 doBoth = True
                 askProgram = False
             else:
@@ -491,27 +500,35 @@ def main():
                 file2 = "p3_group_8_dmem_A.txt"
                 #print("ERROR " + program)
                 askProgram = False
-            elif (program == 'B'):
+            elif (program == "B"):
                 file2 = "p3_group_8_dmem_B.txt"
                 askProgram = False
-            elif (program == 'C'):
+            elif (program == "C"):
                 file2 = "p3_group_8_dmem_C.txt"
                 askProgram = False
-            elif (program == 'D'):
+            elif (program == "D"):
                 file2 = "p3_group_8_dmem_D.txt"
                 askProgram = False
             else:
                 print("\nError. Unrecognized data memory. Try again")
 
-        instr_file = open(file1, "r")
+        instr_file1 = open(file1, "r")
+        instr_file2 = open("p3_group_8_p1_imem.txt", "r")
         data_file = open(file2, "r")
 
-        for line in instr_file:  # Read in instr
+        for line in instr_file1:  # Read in instr
             if (line == "\n" or line[0] == '#'):  # empty lines,comments ignored
                 continue
             line = line.replace("\n", "")
-            Instruction.append(line)  # Copy all instruction into a list
-            Nlines += 1
+            Instruction1.append(line)  # Copy all instruction into a list
+            Nlines1 += 1
+
+        for line in instr_file2:  # Read in instr
+            if (line == "\n" or line[0] == '#'):  # empty lines,comments ignored
+                continue
+            line = line.replace("\n", "")
+            Instruction2.append(line)  # Copy all instruction into a list
+            Nlines2 += 1
 
         for line in data_file:  # Read in data memory
             if (line == "\n" or line[0] == '#'):  # empty lines,comments ignored
@@ -519,20 +536,20 @@ def main():
             Memory.append(int(line, 2))
 
         if (mode == 1):  # Check wether to use disasembler or assembler or simulation
-            Instruction1 = disassemble(Instruction, Nlines, True)
-            askAgain = simulate(Instruction1, Nsteps, debug_mode, Memory)
+            InstructionFirst = disassemble(Instruction1, Nlines1, True)
+            askAgain = simulate(InstructionFirst, Nsteps, debug_mode, Memory)
             if(doBoth == True):
-                instr_file.close()
-                instr_file = open("p3_group_8_p1_imem.txt", "r")
-                Instruction1 = assemble(Instruction, Nlines)
-                askAgain = simulate(Instruction1, Nsteps, debug_mode, Memory)
+                InstructionSecond = disassemble(Instruction2, Nlines2, True)
+                askAgain = simulate(InstructionSecond, Nsteps, debug_mode, Memory)
         elif (mode == 2):
             askAgain = disassemble(Instruction, Nlines, False)
         elif (mode == 3):
             askAgain = assemble(Instruction, Nlines)
 
-    instr_file.close()
+    instr_file1.close()
+    instr_file2.close()
     data_file.close()
+    
     exit()
 
 
